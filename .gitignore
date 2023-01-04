@@ -16,6 +16,7 @@ biases/
 # Dreambooth files
 checkpoints/
 dreambooth-pipeline/
+_dreambooth-pipeline/
 
 # Outputs
 outputs/

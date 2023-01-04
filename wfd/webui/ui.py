@@ -14,14 +14,9 @@ import numpy as np
 
 # from .doki import theme
 
-def get_pretrained_tile_vae_path(tileset):
-    if tileset == "platform":
-        return "dreambooth-pipeline/tile_vae"
-    raise NotImplementedError
-
 def get_pretrained_path(tileset):
     if tileset == "platform":
-        return "dreambooth-pipeline"
+        return "wdcqc/starcraft-platform-terrain-32x32"
     raise NotImplementedError
 
 def get_wfc_data_path(tileset):
@@ -52,8 +47,11 @@ def run_demo(
     else:
         print("Warning: CUDA is not available. Using CPU, which will be very slow for this demo.")
         device = "cpu"
-        
-    tilenet = AutoencoderTile.from_pretrained(get_pretrained_tile_vae_path(tileset)).to(device)
+
+    tilenet = AutoencoderTile.from_pretrained(
+        get_pretrained_path(tileset),
+        subfolder="tile_vae"
+    ).to(device)
     wfc_data_path = get_wfc_data_path(tileset)
     pipeline = WaveFunctionDiffusionPipeline.from_pretrained(
         get_pretrained_path(tileset),
@@ -118,7 +116,10 @@ def run_demo_img2img(
         print("Warning: CUDA is not available. Using CPU, which will be very slow for this demo.")
         device = "cpu"
 
-    tilenet = AutoencoderTile.from_pretrained(get_pretrained_tile_vae_path(tileset)).to(device)
+    tilenet = AutoencoderTile.from_pretrained(
+        get_pretrained_path(tileset),
+        subfolder="tile_vae"
+    ).to(device)
     wfc_data_path = get_wfc_data_path(tileset)
     pipeline = WaveFunctionDiffusionImg2ImgPipeline.from_pretrained(
         get_pretrained_path(tileset),

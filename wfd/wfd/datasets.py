@@ -242,7 +242,8 @@ class SCInputMapsDreamBoothDataset(torch.utils.data.Dataset):
         size=512,
         center_crop=False,
         append_map_name=False,
-        brightness_fix=0.10
+        brightness_fix=0.10,
+        map_size=(32, 32)
     ):
         self.size = size
         self.center_crop = center_crop
@@ -256,10 +257,11 @@ class SCInputMapsDreamBoothDataset(torch.utils.data.Dataset):
 
         mapdir = instance_data_root
         input_maps = [os.path.join(mapdir, fn) for fn in os.listdir(mapdir) if fn.endswith(".scx") or fn.endswith(".scm")]
+        mapw, maph = map_size
         self.sc_dataset = SCInputMapsDataset(
             input_maps, 
-            w = 32,
-            h = 32,
+            w = mapw,
+            h = maph,
             img_size = (size, size),
             shrink_range = True
         )

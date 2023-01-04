@@ -8,17 +8,17 @@ from PIL import Image
 
 # Import VAEs
 from diffusers import AutoencoderKL
-from wf_diffusers import AutoencoderTile
+from wfd.wf_diffusers import AutoencoderTile
 from torchinfo import summary
 
 # SCMap utilities
-from data_processing import randomize_subtiles, get_cv5_data, process_input_maps, get_shrink_mapping
-from scmap_utils import get_default_output_map_data, replace_tile_data, get_map_data, get_tile_data
-from datasets import SCInputMapsDataset, SCRandomMapsDataset
+from wfd.scmap import randomize_subtiles, get_cv5_data, process_input_maps, get_shrink_mapping
+from wfd.scmap import get_default_output_map_data, replace_tile_data, get_map_data, get_tile_data
+from wfd import SCInputMapsDataset, SCRandomMapsDataset
 
 # Train loop
-from train_loop import train_loop
-from ml_utils import default_loss_weights
+from wfd import train_loop
+from wfd import default_loss_weights
 
 def round_to_multiples_of_n(x, n):
     return x + (n - x%n)%n

@@ -3,7 +3,6 @@ bitsandbytes
 diffusers
 doki_theme_jupyter
 einops
-formers
 gradio
 huggingface_hub
 numpy
