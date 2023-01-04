@@ -1,0 +1,495 @@
+/* DOKI */
+
+* {{
+    caret-color: {accentColor};
+    scrollbar-color: {accentColor};
+}}
+
+::-moz-selection {{
+  background: {selectionBackground};
+  color: {selectionForeground};
+}}
+
+::selection {{
+  background: {selectionBackground};
+  color: {selectionForeground};
+}}
+
+*::-webkit-scrollbar {{
+  width: 0.5em;
+}}
+
+*::-webkit-scrollbar-track {{
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.00);
+}}
+
+*::-webkit-scrollbar-thumb {{
+  background-color: {accentColor};
+}}
+
+/* TOKENS */
+
+.gradio-container .progress-bar {{
+    background-color: {accentColor};
+}}
+
+.gradio-container,
+.gradio-container button,
+.gradio-container input,
+.gradio-container optgroup,
+.gradio-container select,
+.gradio-container textarea {{
+    color: {foregroundColor};
+}}
+
+.gradio-container *,
+.gradio-container :before,
+.gradio-container :after {{
+    border-color: {borderColor};
+}}
+
+.gradio-container .border-transparent {{
+    border-color: transparent;
+}}
+
+.gradio-container.gradio-container,
+.gradio-container .bg-gray-200,
+.gradio-container .bg-white,
+.gradio-container .cover-bg.cover-bg,
+.gradio-container .bg-white\/90 {{
+	background-color: {baseBackground};
+}}
+
+.gradio-container .gr-box,
+.gradio-container .gr-prose,
+.gradio-container .gr-prose h1,
+.gradio-container .gr-prose h2,
+.gradio-container .gr-prose h3,
+.gradio-container .gr-prose h4,
+.gradio-container .gr-prose h5,
+.gradio-container .gr-prose h6,
+.gradio-container .text-gray-500,
+.gradio-container .text-gray-600,
+.gradio-container .text-gray-700,
+.gradio-container .text-gray-800,
+.gradio-container .text-gray-900,
+.gradio-container .gr-block.gr-box span.text-gray-500,
+.gradio-container .gr-block.gr-box span.text-gray-600,
+.gradio-container .gr-block.gr-box span.text-gray-700,
+.gradio-container .gr-block.gr-box span.text-gray-800,
+.gradio-container .gr-block.gr-box span.text-gray-900,
+.gradio-container .gr-samples-gallery .gr-sample-textbox,
+.gradio-container .gr-samples-gallery .gr-sample-markdown,
+.gradio-container .gr-samples-gallery .gr-sample-html,
+.gradio-container .gr-samples-gallery .gr-sample-slider,
+.gradio-container .gr-samples-gallery .gr-sample-checkbox,
+.gradio-container .gr-samples-gallery .gr-sample-checkboxgroup,
+.gradio-container .gr-samples-gallery .gr-sample-file,
+.gradio-container .gr-samples-gallery .gr-sample-number,
+.gradio-container .gr-samples-gallery .gr-sample-audio,
+.gradio-container .gr-samples-gallery .gr-sample-3d,
+.gradio-container option {{
+    color: {foregroundColor};
+	background-color: {baseBackground};
+}}
+
+.gradio-container .gr-block.gr-box span.text-gray-500,
+.gradio-container .gr-block.gr-box span.text-gray-600,
+.gradio-container .gr-block.gr-box span.text-gray-700,
+.gradio-container .gr-block.gr-box span.text-gray-800,
+.gradio-container .gr-block.gr-box span.text-gray-900 {{
+    border-color: {borderColor};
+}}
+
+.gradio-container .text-indigo-500,
+.gradio-container .text-indigo-600,
+.gradio-container .text-indigo-700,
+.gradio-container .text-indigo-800,
+.gradio-container .text-indigo-900,
+.gradio-container .gr-prose a {{
+    color: {infoForeground};
+}}
+
+.gradio-container .hover\:text-gray-500:hover,
+.gradio-container .hover\:text-gray-600:hover,
+.gradio-container .hover\:text-gray-700:hover,
+.gradio-container .hover\:text-gray-800:hover,
+.gradio-container .hover\:text-gray-900:hover {{
+    color: {accentColor};
+}}
+
+.gradio-container .hover\:border-gray-200:hover,
+.gradio-container .hover\:border-gray-300:hover,
+.gradio-container .hover\:border-gray-400:hover,
+.gradio-container .hover\:border-gray-500:hover {{
+    border-color: {accentColor};
+}}
+
+.gradio-container .gr-prose a:hover
+{{
+    color: {editorAccentColor};
+}}
+
+.gradio-container .gr-box-unrounded {{
+    color: {foregroundColor};
+	background-color: {baseBackground};
+}}
+
+.gradio-container .gr-input {{
+	background-color: {textEditorBackground};
+    --ringoffsetshadow: 0 0 {shadowColor};
+    --ringshadow: 0 0 {shadowColor};
+    --shadow: 0 0 {shadowColor};
+    box-shadow: var(--ringoffsetshadow), var(--ringshadow), var(--shadow);
+}}
+
+.gradio-container .gr-input:focus {{
+    border-color: {accentColor};
+    --ringoffsetshadow: 0 0 {accentShadowColor};
+    --ringshadow: 0 0 3px {accentShadowColor};
+    --shadow: 0 0 {highlightShadowColor};
+    box-shadow: var(--ringoffsetshadow), var(--ringshadow), var(--shadow);
+}}
+
+.gradio-container .gr-label {{
+	color: {lineNumberColor};
+}}
+
+.gradio-container .gr-panel {{
+	background-color: {baseBackground};
+}}
+
+.gradio-container .gr-compact {{
+    border-color: {borderColor};
+}}
+
+.gradio-container .gr-check-radio {{
+    color: {accentColor};
+    border-color: {borderColor};
+	background-color: {textEditorBackground};
+}}
+
+.gradio-container .gr-check-radio:checked {{
+    color: {accentColor};
+    border-color: {accentColor};
+}}
+
+.gradio-container .gr-check-radio:hover {{
+    background-color: currentColor;
+}}
+
+.gradio-container .gr-check-radio:focus {{
+    color: {accentColor};
+    border-color: {accentColor};
+    --ringoffsetshadow: 0 0 {accentShadowColor};
+    --ringshadow: 0 0 3px {accentShadowColor};
+    --shadow: 0 0 {highlightShadowColor};
+    box-shadow: var(--ringoffsetshadow), var(--ringshadow), var(--shadow);
+}}
+
+.gradio-container .gr-input-label {{
+    color: {foregroundColor};
+    background-image: linear-gradient(to top,var(--grdstops));
+    --grdfrom: {gradientFrom};
+    --grdto: {gradientTo};
+    --grdstops: var(--grdfrom), var(--grdto);
+}}
+
+.gradio-container .gr-button {{
+    border-color: {borderColor};
+    --ringoffsetshadow: 0 0 {shadowColor};
+    --ringshadow: 0 0 {shadowColor};
+    --shadow: 0 1px 2px 0 {shadowColor};
+    box-shadow: var(--ringoffsetshadow), var(--ringshadow), var(--shadow);
+    background-color: {baseBackground};
+}}
+
+.gradio-container .gr-button:hover {{
+    background-color: {highlightColor};
+}}
+
+.gradio-container .gr-button:active,
+.gradio-container .gr-check-radio:active {{
+    --shadow: inset 0 2px 4px 0 {shadowColorTransparent};
+    box-shadow: var(--ringoffsetshadow), var(--ringshadow), var(--shadow);
+}}
+
+.gradio-container .gr-button-primary {{
+    color: {selectionForeground};
+    background-image: linear-gradient(to top,var(--grdstops));
+    --grdfrom: {primaryGradientFrom};
+    --grdto: {primaryGradientTo};
+    --grdstops: var(--grdfrom), var(--grdto);
+}}
+
+.gradio-container .gr-button-primary:hover {{
+    background-image: linear-gradient(to top,var(--grdstops));
+    --grdfrom: {primaryHover};
+    --grdto: {primaryHover};
+    --grdstops: var(--grdfrom), var(--grdto);
+}}
+
+.gradio-container .gr-button-secondary {{
+    color: {buttonFont};
+    background-image: linear-gradient(to top,var(--grdstops));
+    --grdfrom: {secondaryGradientFrom};
+    --grdto: {secondaryGradientTo};
+    --grdstops: var(--grdfrom), var(--grdto);
+}}
+
+.gradio-container .gr-button-secondary:hover {{
+    color: {buttonFont};
+    background-image: linear-gradient(to top,var(--grdstops));
+    --grdfrom: {highlightColor};
+    --grdto: {highlightColor};
+    --grdstops: var(--grdfrom), var(--grdto);
+}}
+
+.gradio-container .gr-button-stop {{
+    border-color: {errorColor};
+    background-image: linear-gradient(to top,var(--grdstops));
+    --grdfrom: {errorGradientFrom};
+    --grdto: {errorGradientTo};
+    --grdstops: var(--grdfrom), var(--grdto);
+    color: {errorColor};
+}}
+
+.gradio-container img.gr-sample-image,
+.gradio-container video.gr-sample-video {{
+    border-color: {borderColor};
+}}
+
+.gradio-container .group:hover img.gr-sample-image,
+.gradio-container .group:hover video.gr-sample-video {{
+    border-color: {accentColor};
+}}
+
+.gradio-container .hover\:bg-orange-50:hover {{
+    background-color: {accentColorReallyTransparent};
+}}
+
+.gradio-container .focus-within\:bg-orange-50:focus-within {{
+    background-color: {accentColorReallyTransparent};
+}}
+
+.gradio-container .hover\:divide-orange-100:hover>:not([hidden])~:not([hidden]) {{
+    border-color: inherit;
+}}
+
+.gradio-container .odd\:bg-gray-50:nth-child(odd){{
+    background-color: {secondaryBackground};
+}}
+
+.gradio-container .hover\:bg-orange-50.odd\:bg-gray-50:nth-child(odd):hover {{
+    background-color: {accentColorReallyTransparent};
+}}
+
+/* RANGE */
+
+.gradio-container input[type=range] {{
+    -webkit-appearance: none;
+    background: transparent;
+}}
+
+.gradio-container input[type=range]:focus {{
+    outline: none;
+}}
+
+.gradio-container input[type=range]::-webkit-slider-runnable-track {{
+    cursor: pointer;
+    height: 6px;
+    border-radius: 3px;
+    background: {accentColor};
+}}
+
+.gradio-container input[type=range]:hover::-webkit-slider-runnable-track {{
+    background: {accentColorDeeper};
+}}
+
+.gradio-container input[type=range]::-moz-range-track {{
+    cursor: pointer;
+    height: 6px;
+    border-radius: 3px;
+    background: {accentColor};
+}}
+
+.gradio-container input[type=range]:hover::-moz-range-track {{
+    background: {accentColorDeeper};
+}}
+
+.gradio-container input[type=range]::-ms-fill-upper,
+.gradio-container input[type=range]::-ms-fill-lower {{
+    cursor: pointer;
+    height: 6px;
+    border-radius: 3px;
+    background: {accentColor};
+}}
+
+.gradio-container input[type=range]:hover::-ms-fill-upper,
+.gradio-container input[type=range]:hover::-ms-fill-lower {{
+    background: {accentColorDeeper};
+}}
+
+.gradio-container input[type=range]::-webkit-slider-thumb {{
+    box-shadow: 0 0 3px {shadowColor};
+    border: 2px solid {borderColor};
+    height: 16px;
+    width: 16px;
+    border-radius: 16px;
+    background: {accentColor};
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -5px;
+}}
+
+.gradio-container input[type=range]:active::-webkit-slider-thumb {{
+    background: {accentColorDeeper};
+}}
+
+.gradio-container input[type=range]::-moz-range-thumb {{
+    box-shadow: 0 0 3px {shadowColor};
+    border: 2px solid {borderColor};
+    height: 16px;
+    width: 16px;
+    border-radius: 16px;
+    background: {accentColor};
+    cursor: pointer;
+    margin-top: -5px;
+}}
+
+.gradio-container input[type=range]:active::-moz-range-thumb {{
+    background: {accentColorDeeper};
+}}
+
+.gradio-container input[type=range]::-ms-thumb {{
+    box-shadow: 0 0 3px {shadowColor};
+    border: 2px solid {borderColor};
+    height: 16px;
+    width: 16px;
+    border-radius: 16px;
+    background: {accentColor};
+    cursor: pointer;
+    margin-top: -5px;
+}}
+
+.gradio-container input[type=range]:active::-ms-thumb {{
+    background: {accentColorDeeper};
+}}
+
+/* GLOBAL.DARK */
+
+.gradio-container.dark .bg-gray-950,
+.gradio-container.dark .dark\:bg-gray-950 {{
+	background-color: {baseBackground};
+}}
+
+.gradio-container.dark {{
+    color: {foregroundColor};
+	background-color: {baseBackground};
+}}
+.gradio-container.dark .text-gray-500,
+.gradio-container.dark .text-gray-600 {{
+    color: {foregroundColor};
+}}
+
+.gradio-container.dark .text-gray-700,
+.gradio-container.dark .text-gray-800,
+.gradio-container.dark .text-gray-900 {{
+    color: {lineNumberColor};
+}}
+
+.gradio-container.dark .border,
+.gradio-container.dark .border-gray-100,
+.gradio-container.dark .border-gray-200,
+.gradio-container.dark .border-gray-300 {{
+    border-color: {borderColor};
+}}
+
+.gradio-container.dark .bg-white {{
+	background-color: {baseBackground};
+}}
+
+.gradio-container.dark .bg-gray-50 {{
+	background-color: {baseBackground};
+}}
+
+.gradio-container.dark .bg-gray-200 {{
+	background-color: {baseBackground};
+}}
+
+/* SPECIFIC */
+
+.gradio-container .progressDiv {{
+	background-color: {baseBackground};
+}}
+
+.gradio-container .progress {{
+	background-color: {accentColor};
+}}
+
+.gradio-container #txt2img_skip,
+.gradio-container #img2img_skip,
+.gradio-container #txt2img_interrupt,
+.gradio-container #img2img_interrupt {{
+    color: {buttonFont};
+    background-image: linear-gradient(to top,var(--grdstops));
+    --grdfrom: {secondaryGradientFrom};
+    --grdto: {secondaryGradientTo};
+    --grdstops: var(--grdfrom), var(--grdto);
+}}
+
+.gradio-container #txt2img_skip:hover,
+.gradio-container #img2img_skip:hover ,
+.gradio-container #txt2img_interrupt:hover,
+.gradio-container #img2img_interrupt:hover {{
+    color: {buttonFont};
+    background-image: linear-gradient(to top,var(--grdstops));
+    --grdfrom: {highlightColor};
+    --grdto: {highlightColor};
+    --grdstops: var(--grdfrom), var(--grdto);
+}}
+
+/* GLOBAL.CROPPER */
+
+.gradio-container .cropper-drag-box {{
+	background-color: #fff;
+	opacity: 0;
+}}
+
+.gradio-container .cropper-modal {{
+	background-color: #000;
+	opacity: 0.5;
+}}
+
+.gradio-container .cropper-view-box {{
+	outline: 1px solid #39f;
+	outline-color: rgba(51, 153, 255, 0.75);
+}}
+
+.gradio-container .cropper-dashed {{
+	border: 0 dashed #eee;
+	opacity: 0.5;
+}}
+
+.gradio-container .cropper-center::before,
+.gradio-container .cropper-center::after {{
+	background-color: #eee;
+}}
+
+.gradio-container .cropper-face {{
+	background-color: #fff;
+}}
+
+.gradio-container .cropper-line {{
+	background-color: #39f;
+}}
+
+.gradio-container .cropper-point {{
+	background-color: #39f;
+	opacity: 0.75;
+}}
+
+.gradio-container .cropper-point.point-se::before {{
+	background-color: #39f;
+	opacity: 0;
+}}

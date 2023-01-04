@@ -1,0 +1,31 @@
+# Python files
+__pycache__/
+.ipynb_checkpoints/
+*.py[cod]
+*$py.class
+
+# Starcraft files
+maps/
+train_data/
+sc_data/
+
+# Weights
+weights/
+biases/
+
+# Dreambooth files
+checkpoints/
+dreambooth-pipeline/
+
+# Outputs
+outputs/
+
+# Temp files
+temp/
+
+# Backup files
+backup/
+
+# Local experimental files
+test*.ipynb
+sandbox.ipynb

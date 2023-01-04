@@ -1,0 +1,18 @@
+{
+    "epochs" : 5,
+    "learning_rate" : 0.024,
+    "loss_weights" : {
+        "match": 0.4,
+        "kl": 0,
+        "recon": 0,
+        "nudge" : 0.4,
+        "ce" : 0.2
+    },
+    "recon_temperature" : 0.01,
+    "batch_size" : 2,
+    "nudge" : 5,
+    "nudge_loss_type" : "ce",
+    "clamp_grad" : 10,
+    "grad_accum" : 1,
+    "log_interval" : 100
+}

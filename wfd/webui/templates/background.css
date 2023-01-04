@@ -1,0 +1,31 @@
+/* BG */
+
+.gradio-container.gradio-container {{
+    background-image: url({img});
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: {align};
+    background-size: cover;
+}}
+
+.gradio-container .gr-input,
+.gradio-container .gr-panel,
+.gradio-container .gr-box,
+.gradio-container .bg-gray-200,
+.gradio-container .bg-white\/90,
+.gradio-container .bg-white,
+.gradio-container .cover-bg.cover-bg,
+.gradio-container .gr-prose,
+.gradio-container .gr-prose h1,
+.gradio-container .text-gray-500,
+.gradio-container .text-gray-600,
+.gradio-container .text-gray-700,
+.gradio-container .text-gray-800,
+.gradio-container .text-gray-900,
+.gradio-container.dark .dark\:bg-gray-950 {{
+    background-image: url({img});
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: {align};
+    background-size: cover;
+}}

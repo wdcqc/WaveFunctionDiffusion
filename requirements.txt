@@ -1,0 +1,17 @@
+accelerate
+bitsandbytes
+diffusers
+doki_theme_jupyter
+einops
+formers
+gradio
+huggingface_hub
+numpy
+opencv_python
+packaging
+Pillow
+torch
+torchinfo
+torchvision
+tqdm
+transformers

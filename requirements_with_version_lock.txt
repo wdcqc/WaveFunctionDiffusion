@@ -1,0 +1,17 @@
+accelerate==0.15.0
+bitsandbytes==0.35.4
+diffusers==0.12.0.dev0
+doki_theme_jupyter==88.1.1.1.0
+einops==0.4.1
+formers==0.0.15.dev376
+gradio==3.15.0
+huggingface_hub==0.11.1
+numpy==1.20.3
+opencv_python==4.5.5.64
+packaging==21.0
+Pillow==9.4.0
+torch==1.13.1+cu117
+torchinfo==1.7.1
+torchvision==0.14.1+cu117
+tqdm==4.62.3
+transformers==4.25.1
