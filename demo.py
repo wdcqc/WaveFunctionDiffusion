@@ -3,6 +3,14 @@
 # Open-source under license obtainable in project root (LICENSE.md).
 
 from wfd.webui import start_demo
+import argparse
 
 if __name__ == "__main__":
-    start_demo()
+    parser = argparse.ArgumentParser(description="Demo script for WaveFunctionDiffusion.")
+    parser.add_argument(
+        "--colab",
+        action="store_true", 
+        help="Use it in Google Colab.",
+    )
+    args = parser.parse_args()
+    start_demo(args)

@@ -14,6 +14,8 @@ import numpy as np
 
 # from .doki import theme
 
+DEFAULT_TILESET = "platform"
+
 def get_pretrained_path(tileset):
     if tileset == "platform":
         return "wdcqc/starcraft-platform-terrain-32x32"
@@ -171,7 +173,22 @@ def run_demo_img2img(
 
     return image, gen_map
 
-def start_demo():
+def preinstall():
+    tileset = DEFAULT_TILESET
+    tilenet = AutoencoderTile.from_pretrained(
+        get_pretrained_path(tileset),
+        subfolder="tile_vae"
+    )
+    wfc_data_path = get_wfc_data_path(tileset)
+    pipeline = WaveFunctionDiffusionImg2ImgPipeline.from_pretrained(
+        get_pretrained_path(tileset),
+        tile_vae = tilenet,
+        wfc_data_path = wfc_data_path
+    )
+
+def start_demo(args):
+    if args.colab:
+        preinstall()
     with gr.Blocks(analytics_enabled=False, title="WaveFunctionDiffusion demo page") as demo:
         with gr.Tab("txt2img"):
             with gr.Row():
@@ -243,4 +260,7 @@ def start_demo():
             ])
         theme()
 
-    demo.launch()
+    if args.colab:
+        demo.launch(debug=True)
+    else:
+        demo.launch()
