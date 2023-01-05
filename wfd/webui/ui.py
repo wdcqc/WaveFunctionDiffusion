@@ -190,6 +190,8 @@ def start_demo(args):
     if args.colab:
         preinstall()
     with gr.Blocks(analytics_enabled=False, title="WaveFunctionDiffusion demo page") as demo:
+        if args.link_to_colab:
+            gr.Markdown("Run this demo in [Google Colab](https://colab.research.google.com/github/wdcqc/WaveFunctionDiffusion/blob/remaster/colab/WaveFunctionDiffusion_Demo.ipynb)")
         with gr.Tab("txt2img"):
             with gr.Row():
                 with gr.Column():

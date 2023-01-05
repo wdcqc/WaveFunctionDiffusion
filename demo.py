@@ -12,5 +12,10 @@ if __name__ == "__main__":
         action="store_true", 
         help="Use it in Google Colab.",
     )
+    parser.add_argument(
+        "--link_to_colab",
+        action="store_true", 
+        help="Add a link to Google Colab.",
+    )
     args = parser.parse_args()
     start_demo(args)
