@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='wfd',
@@ -8,7 +8,7 @@ setup(
     author='wdcqc',
     author_email='119406052+wdcqc@users.noreply.github.com',
     license='creativeml-openrail-m',
-    packages=['wfd'],
+    packages=find_packages("."),
     install_requires=[
         "accelerate",
         "bitsandbytes",
