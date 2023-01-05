@@ -2,9 +2,9 @@ from setuptools import setup
 
 setup(
     name='wfd',
-    version='0.1.0',    
+    version='0.2.0',    
     description='Wave Function Diffusion',
-    url='https://github.com/shuds13/pyexample',
+    url='https://github.com/wdcqc/WaveFunctionDiffusion',
     author='wdcqc',
     author_email='119406052+wdcqc@users.noreply.github.com',
     license='creativeml-openrail-m',

@@ -40,7 +40,7 @@ from .safety_checker import StableDiffusionSafetyChecker
 from .wf_vae import AutoencoderTile
 
 from .pipeline_output import WaveFunctionDiffusionPipelineOutput
-from ..wfd.losses import WFCLossEinsum
+from ..wfdf.losses import WFCLossEinsum
 
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 

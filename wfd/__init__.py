@@ -10,14 +10,14 @@ from .wf_diffusers import (
     preprocess_img
 )
 from .wfc import WFCGenerator, WFCGeneratorPriorDist
-from .wfd import (
+from .wfdf import (
     datasets,
     losses,
     train_loop,
     utils
 )
 
-from .wfd import (
+from .wfdf import (
     SCInputMapsDataset,
     SCRandomMapsDataset,
     SCInputMapsDreamBoothDataset,
