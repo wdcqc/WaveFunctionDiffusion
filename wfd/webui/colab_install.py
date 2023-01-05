@@ -1,4 +1,4 @@
-import subprocess
+import subprocess, os
 
 # taken from automatic1111 UI
 def run(command, desc=None, errdesc=None, custom_env=None):

@@ -3,11 +3,15 @@ __pycache__/
 .ipynb_checkpoints/
 *.py[cod]
 *$py.class
+*.egg-info/
 
 # Starcraft files
 maps/
 train_data/
 sc_data/
+
+# Huggingface
+spaces/
 
 # Weights
 weights/
