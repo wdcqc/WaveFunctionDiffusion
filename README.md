@@ -10,7 +10,7 @@ The model is trained with 265 melee maps on the Space Platform tileset, which ar
 
 ### Run with Colab
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/wdcqc/WaveFunctionDiffusion/blob/remaster/WaveFunctionDiffusion_Demo.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/wdcqc/WaveFunctionDiffusion/blob/remaster/colab/WaveFunctionDiffusion_Demo.ipynb)
 
 ### Installation
 
@@ -138,8 +138,8 @@ In programming the best way to learn is to build something yourself, so it's not
 
 __Q: This will replace game level designing jobs and make everyone jobless!!!!🤬🤬🤬__
 
-A: I apologize in such cases as I never knew there existed that kind of jobs, sounds like the best job ever created in human history lmao
+A: While I really don't think this thing'd be able to do it, at this point we should probably stop doing jobs and wait for our AI overlords to overtake us all
 
 __Q: Can this algorithm solve sudoku?__
 
-A: You should do it yourself. It's not that hard.
+A: You should do it yourself. It's a game.
