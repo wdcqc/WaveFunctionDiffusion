@@ -21,6 +21,7 @@ biases/
 checkpoints/
 dreambooth-pipeline/
 _dreambooth-pipeline/
+wdcqc/
 
 # Outputs
 outputs/

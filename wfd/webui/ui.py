@@ -12,9 +12,12 @@ import random, time
 from PIL import Image
 import numpy as np
 
-# from .doki import theme
-
 DEFAULT_TILESET = "platform"
+
+current_tileset = ""
+current_mode = ""
+current_tilenet = None
+current_pipeline = None
 
 def get_pretrained_path(tileset):
     if tileset == "platform":
@@ -43,6 +46,8 @@ def run_demo(
     wfc_guidance_final_strength,
     show_raw_image
 ):
+    global current_tileset, current_mode, current_tilenet, current_pipeline
+
     # 1. Define pipeline
     if torch.cuda.is_available():
         device = "cuda"
@@ -50,18 +55,28 @@ def run_demo(
         print("Warning: CUDA is not available. Using CPU, which will be very slow for this demo.")
         device = "cpu"
 
-    tilenet = AutoencoderTile.from_pretrained(
-        get_pretrained_path(tileset),
-        subfolder="tile_vae"
-    ).to(device)
     wfc_data_path = get_wfc_data_path(tileset)
-    pipeline = WaveFunctionDiffusionPipeline.from_pretrained(
-        get_pretrained_path(tileset),
-        tile_vae = tilenet,
-        wfc_data_path = wfc_data_path
-    )
+
+    if current_tileset == tileset and current_mode == "txt2img":
+        tilenet = current_tilenet
+        pipeline = current_pipeline
+    else:
+        tilenet = AutoencoderTile.from_pretrained(
+            get_pretrained_path(tileset),
+            subfolder="tile_vae"
+        ).to(device)
+        pipeline = WaveFunctionDiffusionPipeline.from_pretrained(
+            get_pretrained_path(tileset),
+            tile_vae = tilenet,
+            wfc_data_path = wfc_data_path
+        )
+        pipeline.to(device)
+
+        current_mode = "txt2img"
+        current_tileset = tileset
+        current_tilenet = tilenet
+        current_pipeline = pipeline
         
-    pipeline.to(device)
 
     if auto_add_dreambooth:
         prompt = get_dreambooth_prompt(tileset) + prompt
@@ -111,6 +126,8 @@ def run_demo_img2img(
     wfc_guidance_final_strength,
     show_raw_image
 ):
+    global current_tileset, current_mode, current_tilenet, current_pipeline
+
     # 1. Define pipeline
     if torch.cuda.is_available():
         device = "cuda"
@@ -118,17 +135,27 @@ def run_demo_img2img(
         print("Warning: CUDA is not available. Using CPU, which will be very slow for this demo.")
         device = "cpu"
 
-    tilenet = AutoencoderTile.from_pretrained(
-        get_pretrained_path(tileset),
-        subfolder="tile_vae"
-    ).to(device)
     wfc_data_path = get_wfc_data_path(tileset)
-    pipeline = WaveFunctionDiffusionImg2ImgPipeline.from_pretrained(
-        get_pretrained_path(tileset),
-        tile_vae = tilenet,
-        wfc_data_path = wfc_data_path
-    )
-    pipeline.to(device)
+
+    if current_tileset == tileset and current_mode == "img2img":
+        tilenet = current_tilenet
+        pipeline = current_pipeline
+    else:
+        tilenet = AutoencoderTile.from_pretrained(
+            get_pretrained_path(tileset),
+            subfolder="tile_vae"
+        ).to(device)
+        pipeline = WaveFunctionDiffusionImg2ImgPipeline.from_pretrained(
+            get_pretrained_path(tileset),
+            tile_vae = tilenet,
+            wfc_data_path = wfc_data_path
+        )
+        pipeline.to(device)
+
+        current_mode = "img2img"
+        current_tileset = tileset
+        current_tilenet = tilenet
+        current_pipeline = pipeline
 
     if auto_add_dreambooth:
         prompt = get_dreambooth_prompt(tileset) + prompt
