@@ -172,6 +172,7 @@
 .gradio-container .gr-check-radio:checked {{
     color: {accentColor};
     border-color: {accentColor};
+    background-color: {accentShadowColor};
 }}
 
 .gradio-container .gr-check-radio:hover {{
