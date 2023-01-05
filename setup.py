@@ -2,13 +2,19 @@ from setuptools import setup, find_packages
 
 setup(
     name='wfd',
-    version='0.2.0',    
+    version='0.3.0',    
     description='Wave Function Diffusion',
     url='https://github.com/wdcqc/WaveFunctionDiffusion',
     author='wdcqc',
     author_email='119406052+wdcqc@users.noreply.github.com',
     license='creativeml-openrail-m',
     packages=find_packages("."),
+    package_data={'': [
+        'mpqapi/*.so',
+        'mpqapi/*.dll',
+        'webui/*.json',
+        'webui/templates/*.css',
+    ]},
     include_package_data=True,
     python_requires=">=3.7.0",
     install_requires=[
