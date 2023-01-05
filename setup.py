@@ -9,6 +9,8 @@ setup(
     author_email='119406052+wdcqc@users.noreply.github.com',
     license='creativeml-openrail-m',
     packages=find_packages("."),
+    include_package_data=True,
+    python_requires=">=3.7.0",
     install_requires=[
         "accelerate",
         "bitsandbytes",
