@@ -8,6 +8,8 @@ A WFC Guidance is also added to the sampling process, which pushes the generated
 
 The model is trained with 265 melee maps on the Space Platform tileset, which are mostly downloaded from Battle.net, bounding.net (scmscx.com) and broodwarmaps.net.
 
+Huggingface: https://huggingface.co/wdcqc/starcraft-platform-terrain-32x32
+
 ### Run with Colab
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/wdcqc/WaveFunctionDiffusion/blob/remaster/colab/WaveFunctionDiffusion_Demo.ipynb)
