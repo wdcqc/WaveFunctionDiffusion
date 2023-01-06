@@ -101,7 +101,7 @@ def run_demo(
 
     # 4. Get map image
     if not show_raw_image:
-        image = demo_map_image(tile_result, wfc_data_path = "tile_data/wfc/platform_32x32.npz")
+        image = demo_map_image(tile_result, wfc_data_path = wfc_data_path)
 
     # 5. Generate scx file
     gen_map = "outputs/{}_{:04d}.scx".format(time.strftime("%Y%m%d_%H%M%S"), random.randint(0, 1e4))
@@ -189,7 +189,7 @@ def run_demo_img2img(
 
     # 4. Get map image
     if not show_raw_image:
-        image = demo_map_image(tile_result, wfc_data_path = "tile_data/wfc/platform_32x32.npz")
+        image = demo_map_image(tile_result, wfc_data_path = wfc_data_path)
 
     # 5. Generate scx file
     gen_map = "outputs/{}_{:04d}.scx".format(time.strftime("%Y%m%d_%H%M%S"), random.randint(0, 1e4))
