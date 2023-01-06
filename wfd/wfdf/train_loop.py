@@ -38,7 +38,14 @@ def train_loop(net,
     mse = nn.MSELoss()
     ce = nn.CrossEntropyLoss()
     recon = ReconstructionLoss()
-    optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9)
+
+    need_encoder = (loss_weights["kl"] != 0 or loss_weights["match"] != 0 or loss_weights["ce"] != 0 or loss_weights["recon"] != 0)
+    need_full_autoencoder = (loss_weights["match"] != 0 or loss_weights["ce"] != 0 or loss_weights["recon"] != 0)
+
+    if need_encoder: # why I feel there is a loophole here
+        optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9)
+    else:
+        optimizer = torch.optim.SGD(net.decoder.parameters(), lr=lr, momentum=0.9)
 
     for epoch in range(epochs):
         train_loss, train_count = 0.0, 0
@@ -51,8 +58,15 @@ def train_loop(net,
             tiles_1h = tiles_1h.permute(0, 3, 1, 2)
             images = images.to(device)
             
-            net_encode_result = net.encode(tiles_1h.float())
-            net_decode_result = net.decode(net_encode_result.latent_dist.sample())
+            if need_encoder:
+                net_encode_result = net.encode(tiles_1h.float())
+                if need_full_autoencoder:
+                    net_decode_result = net.decode(net_encode_result.latent_dist.sample())
+                else:
+                    net_decode_result = 0
+            else:
+                net_encode_result = 0
+                net_decode_result = 0
             
             # calculate losses
             total_loss = 0
@@ -107,7 +121,8 @@ def train_loop(net,
             # clamp gradients
             if clamp is not None:
                 for param in net.parameters():
-                    param.grad.clamp_(-clamp, clamp)
+                    if param.grad is not None:
+                        param.grad.clamp_(-clamp, clamp)
                     
             optimizer.step()
             

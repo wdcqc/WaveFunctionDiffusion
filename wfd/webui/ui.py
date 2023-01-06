@@ -13,6 +13,7 @@ from PIL import Image
 import numpy as np
 
 DEFAULT_TILESET = "platform"
+SUPPORTED_TILESETS = ["platform"]
 
 current_tileset = ""
 current_mode = ""
@@ -201,17 +202,30 @@ def run_demo_img2img(
     return image, gen_map
 
 def preinstall():
+    global current_tileset, current_mode, current_tilenet, current_pipeline
+
+    if torch.cuda.is_available():
+        device = "cuda"
+    else:
+        device = "cpu"
+
     tileset = DEFAULT_TILESET
     tilenet = AutoencoderTile.from_pretrained(
         get_pretrained_path(tileset),
         subfolder="tile_vae"
-    )
+    ).to(device)
     wfc_data_path = get_wfc_data_path(tileset)
-    pipeline = WaveFunctionDiffusionImg2ImgPipeline.from_pretrained(
+    pipeline = WaveFunctionDiffusionPipeline.from_pretrained(
         get_pretrained_path(tileset),
         tile_vae = tilenet,
         wfc_data_path = wfc_data_path
     )
+    pipeline.to(device)
+
+    current_mode = "txt2img"
+    current_tileset = tileset
+    current_tilenet = tilenet
+    current_pipeline = pipeline
 
 def start_demo(args):
     if args.colab:
@@ -225,7 +239,7 @@ def start_demo(args):
                     prompt = gr.Textbox(label="Prompt", value="Lost Temple")
                     auto_add_dreambooth = gr.Checkbox(value=True, label="Automatically add the dreambooth prompt ('isometric scspace terrain')")
                     neg_prompt = gr.Textbox(label="Negative Prompt")
-                    tileset = gr.Dropdown(["platform"], value="platform", label="Tileset (currently only platform is trained)")
+                    tileset = gr.Dropdown(SUPPORTED_TILESETS, value=DEFAULT_TILESET, label="Tileset (currently only platform is trained)")
                     steps = gr.Slider(minimum=1, maximum=100, step=1, value=50, label="Scheduler steps")
                     wfc_guidance_start_step = gr.Slider(minimum=0, maximum=50, value=20, step=1, label="WFC guidance starting step")
                     wfc_guidance_strength = gr.Slider(minimum=0, maximum=100, value=5, step=0.1, label="WFC guidance strength")
@@ -258,7 +272,7 @@ def start_demo(args):
                     i2i_auto_add_dreambooth = gr.Checkbox(value=True, label="Automatically add the dreambooth prompt ('isometric scspace terrain')")
                     i2i_neg_prompt = gr.Textbox(label="Negative Prompt")
                     i2i_image_pil = gr.Image(type="pil", label="Image")
-                    i2i_tileset = gr.Dropdown(["platform"], value="platform", label="Tileset (currently only platform is trained)")
+                    i2i_tileset = gr.Dropdown(SUPPORTED_TILESETS, value=DEFAULT_TILESET, label="Tileset (currently only platform is trained)")
                     i2i_brightness = gr.Slider(minimum=-1, maximum=1, step=0.01, value=0, label="Brightness fix")
                     i2i_steps = gr.Slider(minimum=1, maximum=100, step=1, value=50, label="Scheduler steps")
                     i2i_wfc_guidance_start_step = gr.Slider(minimum=0, maximum=50, value=30, step=1, label="WFC guidance starting step")

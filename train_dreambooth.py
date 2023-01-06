@@ -116,7 +116,8 @@ def parse_args(input_args=None):
         help="Append map name to instance prompt.",
     )
     parser.add_argument("--brightness_fix", type=float, default=0.100, help="Brightness fix")
-    parser.add_argument("--map_size", type=int, nargs=2, default=(32, 32), help="Size of map sliced from training maps")
+    parser.add_argument("--map_size_x", type=int, default=32, help="Horizontal size of map sliced from training maps")
+    parser.add_argument("--map_size_y", type=int, default=32, help="Vertical size of map sliced from training maps")
     parser.add_argument("--prior_loss_weight", type=float, default=1.0, help="The weight of prior preservation loss.")
     parser.add_argument(
         "--num_class_images",
@@ -500,7 +501,7 @@ def main(args):
         class_prompt=args.class_prompt,
         tokenizer=tokenizer,
         size=args.resolution,
-        map_size=args.map_size,
+        map_size=(args.map_size_x, args.map_size_y),
         center_crop=args.center_crop,
         append_map_name=args.append_map_name,
         brightness_fix=args.brightness_fix,
