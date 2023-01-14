@@ -54,6 +54,8 @@ class WaveFunctionDiffusionPipeline(DiffusionPipeline):
     Args:
         vae ([`AutoencoderKL`]):
             Variational Auto-Encoder (VAE) Model to encode and decode images to and from latent representations.
+        tile_vae ([`AutoencoderTile`]):
+            Variational Auto-Encoder (VAE) Model to encode and decode tile probabilities to and from latent representations.
         text_encoder ([`CLIPTextModel`]):
             Frozen text-encoder. Stable Diffusion uses the text portion of
             [CLIP](https://huggingface.co/docs/transformers/model_doc/clip#transformers.CLIPTextModel), specifically
@@ -70,6 +72,8 @@ class WaveFunctionDiffusionPipeline(DiffusionPipeline):
             Please, refer to the [model card](https://huggingface.co/runwayml/stable-diffusion-v1-5) for details.
         feature_extractor ([`CLIPFeatureExtractor`]):
             Model that extracts features from generated images to be used as inputs for the `safety_checker`.
+        wfc_data_path ([`str`]):
+            Extra WFC data used to construct the WFC Loss.
     """
     _optional_components = ["safety_checker", "feature_extractor"]
 
@@ -196,6 +200,24 @@ class WaveFunctionDiffusionPipeline(DiffusionPipeline):
         """
         self.vae.disable_slicing()
         self.tile_vae.disable_slicing()
+
+    def set_precision(self, prec):
+        if self.device == torch.device("cpu"):
+            return
+        if prec == "half":
+            self.vae.half()
+            self.tile_vae.half()
+            self.unet.half()
+            self.text_encoder.half()
+            self.wfc_loss.half()
+        elif prec == "float":
+            self.vae.float()
+            self.tile_vae.float()
+            self.unet.float()
+            self.text_encoder.float()
+            self.wfc_loss.float()
+        else:
+            raise NotImplementedError
 
     def enable_sequential_cpu_offload(self, gpu_id=0):
         r"""
@@ -360,6 +382,23 @@ class WaveFunctionDiffusionPipeline(DiffusionPipeline):
         image = image.cpu().permute(0, 2, 3, 1).float().numpy()
         return image
 
+    def reencode_latents_with_color_balance(self, latents, color_balance = (0, 0, 0), generator=None):
+        latents = 1 / 0.18215 * latents
+        image = self.vae.decode(latents).sample
+        image = image + torch.as_tensor(color_balance, dtype = image.dtype, device = image.device).reshape((1, 3, 1, 1))
+
+        if isinstance(generator, list):
+            batch_size = len(generator)
+            latents = [
+                self.tile_vae.encode(image[i : i + 1]).latent_dist.sample(generator[i]) for i in range(batch_size)
+            ]
+            latents = torch.cat(latents, dim=0)
+        else:
+            latents = self.vae.encode(image).latent_dist.sample(generator)
+
+        latents = 0.18215 * latents
+        return latents
+
     def decode_latents_tile(self, latents, numpy=False):
         latents = 1 / 0.18215 * latents
         image = self.tile_vae.decode(latents).sample
@@ -436,7 +475,7 @@ class WaveFunctionDiffusionPipeline(DiffusionPipeline):
         height: Optional[int] = None,
         width: Optional[int] = None,
         num_inference_steps: int = 50,
-        guidance_scale: float = 7.5,
+        guidance_scale: float = 3.5,
         negative_prompt: Optional[Union[str, List[str]]] = None,
         num_images_per_prompt: Optional[int] = 1,
         eta: float = 0.0,
@@ -450,6 +489,7 @@ class WaveFunctionDiffusionPipeline(DiffusionPipeline):
         wfc_guidance_strength: Optional[float] = 1.0,
         wfc_guidance_final_steps: Optional[int] = 0,
         wfc_guidance_final_strength: Optional[float] = 1.0,
+        color_balance: Optional[List[float]] = None,
     ):
         r"""
         Function invoked when calling the pipeline for generation.
@@ -600,6 +640,9 @@ class WaveFunctionDiffusionPipeline(DiffusionPipeline):
 
 
         # 8. Post-processing
+        if color_balance is not None:
+            latents = reencode_latents_with_color_balance(latents, color_balance, generator=generator)
+
         image = self.decode_latents(latents)
         wave = self.decode_latents_tile(latents, numpy=True)
 

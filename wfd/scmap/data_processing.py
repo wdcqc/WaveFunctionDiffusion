@@ -1,6 +1,14 @@
-import numpy as np, json, struct
+# -*- coding: utf-8 -*-
+# Copyright @ 2023 wdcqc/aieud project.
+# Open-source under license obtainable in project root (LICENSE.md).
+
+import numpy as np, json, struct, os
 from .map_data import get_map_data, get_tile_data, replace_tile_data, get_default_output_map_data
 from tqdm.auto import tqdm
+from .tile_data import TILE_DATA_PATH
+
+CV5_PATHF = os.path.join(TILE_DATA_PATH, "{}_v2.npz")
+MAPPING_PATHF = os.path.join(TILE_DATA_PATH, "{}_mapping.npz")
 
 doodad_start_each_tileset = {
     "badlands" : 1024,
@@ -20,7 +28,7 @@ def l1_normalize(vec):
     vec /= s
     return vec
 
-def get_cv5_data(tileset, pathf = "tile_data/{}_v2.npz"):
+def get_cv5_data(tileset, pathf = CV5_PATHF):
     data = np.load(pathf.format(tileset))["data"].tolist()
     cv5_data = json.loads(data)
     return cv5_data
@@ -37,7 +45,7 @@ def get_null_mapping(tileset):
     gen_to_sc = np.concatenate([[1], np.where(non_nulls)[0]])
     return sc_to_gen, gen_to_sc, len(gen_to_sc)
 
-def get_generator_mapping(tileset, pathf = "tile_data/{}_mapping.npz", merge_subtiles = True):
+def get_generator_mapping(tileset, pathf = MAPPING_PATHF, merge_subtiles = True):
     if not merge_subtiles:
         return get_null_mapping(tileset)
     tileset_data = np.load(pathf.format(tileset))

@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+# Copyright @ 2023 wdcqc/aieud project.
+# Open-source under license obtainable in project root (LICENSE.md).
+
 import gradio as gr
 import torch
 
@@ -5,34 +9,121 @@ from ..wf_diffusers import AutoencoderTile
 from ..wf_diffusers import WaveFunctionDiffusionPipeline
 from ..wf_diffusers import WaveFunctionDiffusionImg2ImgPipeline
 
-from ..scmap import tiles_to_scx, demo_map_image
+from ..scmap import tiles_to_scx, demo_map_image, get_tile_data
 from .doki import theme, theme_settings
 import random, time
 
 from PIL import Image
 import numpy as np
+import os
+import time
 
-DEFAULT_TILESET = "platform"
-SUPPORTED_TILESETS = ["platform"]
+DEFAULT_TILESET = "jungle"
+SUPPORTED_TILESETS = ["ashworld", "badlands", "desert", "ice", "jungle", "platform", "twilight", "installation", "platform_32x32"]
+
+should_log_prompt = False
 
 current_tileset = ""
 current_mode = ""
 current_tilenet = None
 current_pipeline = None
 
+def set_theme(theme):
+    # use this before running start_demo
+    settings_file = os.path.join(os.path.dirname(__file__), "doki_settings.json")
+    try:
+        with open(settings_file, encoding = "utf-8") as fp:
+            doki = json.load(fp)
+    
+        doki["theme"] = theme
+        
+        with open(settings_file, "w", encoding = "utf-8") as fp:
+            json.dump(doki, fp)
+    except Exception as e:
+        print(e)
+
 def get_pretrained_path(tileset):
-    if tileset == "platform":
+    if tileset == "platform_32x32":
         return "wdcqc/starcraft-platform-terrain-32x32"
+    elif tileset == "ashworld":
+        return "wdcqc/starcraft-terrain-64x64"
+    elif tileset == "badlands":
+        return "wdcqc/starcraft-terrain-64x64"
+    elif tileset == "desert":
+        return "wdcqc/starcraft-terrain-64x64"
+    elif tileset == "ice":
+        return "wdcqc/starcraft-terrain-64x64"
+    elif tileset == "jungle":
+        return "wdcqc/starcraft-terrain-64x64"
+    elif tileset == "platform":
+        return "wdcqc/starcraft-terrain-64x64"
+    elif tileset == "twilight":
+        return "wdcqc/starcraft-terrain-64x64"
+    elif tileset == "installation":
+        return "wdcqc/starcraft-terrain-64x64"
+    raise NotImplementedError
+
+def get_vae_path(tileset):
+    if tileset == "platform_32x32":
+        return "wdcqc/starcraft-platform-terrain-32x32", "tile_vae"
+    elif tileset == "ashworld":
+        return "wdcqc/starcraft-terrain-64x64", "tile_vae_ashworld"
+    elif tileset == "badlands":
+        return "wdcqc/starcraft-terrain-64x64", "tile_vae_badlands"
+    elif tileset == "desert":
+        return "wdcqc/starcraft-terrain-64x64", "tile_vae_desert"
+    elif tileset == "ice":
+        return "wdcqc/starcraft-terrain-64x64", "tile_vae_ice"
+    elif tileset == "jungle":
+        return "wdcqc/starcraft-terrain-64x64", "tile_vae_jungle"
+    elif tileset == "platform":
+        return "wdcqc/starcraft-terrain-64x64", "tile_vae_platform"
+    elif tileset == "twilight":
+        return "wdcqc/starcraft-terrain-64x64", "tile_vae_twilight"
+    elif tileset == "installation":
+        return "wdcqc/starcraft-terrain-64x64", "tile_vae_install"
     raise NotImplementedError
 
 def get_wfc_data_path(tileset):
-    if tileset == "platform":
-        return "tile_data/wfc/platform_32x32.npz"
+    if tileset == "platform_32x32":
+        return get_tile_data("wfc/platform_32x32.npz")
+    elif tileset == "ashworld":
+        return get_tile_data("wfc/ashworld_64x64.npz")
+    elif tileset == "badlands":
+        return get_tile_data("wfc/badlands_64x64.npz")
+    elif tileset == "desert":
+        return get_tile_data("wfc/desert_64x64.npz")
+    elif tileset == "ice":
+        return get_tile_data("wfc/ice_64x64.npz")
+    elif tileset == "jungle":
+        return get_tile_data("wfc/jungle_64x64.npz")
+    elif tileset == "platform":
+        return get_tile_data("wfc/platform_64x64.npz")
+    elif tileset == "twilight":
+        return get_tile_data("wfc/twilight_64x64.npz")
+    elif tileset == "installation":
+        return get_tile_data("wfc/install_64x64.npz")
     raise NotImplementedError
 
 def get_dreambooth_prompt(tileset):
-    if tileset == "platform":
-        return "isometric scspace terrain, "
+    if tileset == "platform_32x32":
+        return ", isometric scspace terrain"
+    elif tileset == "ashworld":
+        return ", isometric starcraft ashworld terrain"
+    elif tileset == "badlands":
+        return ", isometric starcraft badlands terrain"
+    elif tileset == "desert":
+        return ", isometric starcraft desert terrain"
+    elif tileset == "ice":
+        return ", isometric starcraft ice terrain"
+    elif tileset == "jungle":
+        return ", isometric starcraft jungle terrain"
+    elif tileset == "platform":
+        return ", isometric starcraft platform terrain"
+    elif tileset == "twilight":
+        return ", isometric starcraft twilight terrain"
+    elif tileset == "installation":
+        return ", isometric starcraft installation terrain"
     raise NotImplementedError
 
 def run_demo(
@@ -41,6 +132,7 @@ def run_demo(
     neg_prompt,
     tileset,
     steps,
+    cfg_scale,
     wfc_guidance_start_step,
     wfc_guidance_strength,
     wfc_guidance_final_step,
@@ -48,6 +140,9 @@ def run_demo(
     show_raw_image
 ):
     global current_tileset, current_mode, current_tilenet, current_pipeline
+
+    if should_log_prompt:
+        time_start = time.time()
 
     # 1. Define pipeline
     if torch.cuda.is_available():
@@ -62,9 +157,10 @@ def run_demo(
         tilenet = current_tilenet
         pipeline = current_pipeline
     else:
+        vae_path, vae_subfolder = get_vae_path(tileset)
         tilenet = AutoencoderTile.from_pretrained(
-            get_pretrained_path(tileset),
-            subfolder="tile_vae"
+            vae_path,
+            subfolder=vae_subfolder
         ).to(device)
         pipeline = WaveFunctionDiffusionPipeline.from_pretrained(
             get_pretrained_path(tileset),
@@ -72,6 +168,7 @@ def run_demo(
             wfc_data_path = wfc_data_path
         )
         pipeline.to(device)
+        pipeline.set_precision("half")
 
         current_mode = "txt2img"
         current_tileset = tileset
@@ -80,13 +177,14 @@ def run_demo(
         
 
     if auto_add_dreambooth:
-        prompt = get_dreambooth_prompt(tileset) + prompt
+        prompt = prompt + get_dreambooth_prompt(tileset)
 
     # 2. Pipe
     pipeline_output = pipeline(
         prompt,
         negative_prompt = neg_prompt,
         num_inference_steps = steps,
+        guidance_scale = cfg_scale,
         wfc_guidance_start_step = wfc_guidance_start_step,
         wfc_guidance_strength = wfc_guidance_strength,
         wfc_guidance_final_steps = wfc_guidance_final_step,
@@ -111,6 +209,13 @@ def run_demo(
         wfc_data_path = wfc_data_path
     )
 
+    if should_log_prompt:
+        print("Generated image and map for prompt [{}] at {} steps in {:.2f} seconds.".format(
+            prompt,
+            steps,
+            time.time() - time_start
+        ))
+
     return image, gen_map
 
 def run_demo_img2img(
@@ -121,6 +226,7 @@ def run_demo_img2img(
     tileset,
     brightness,
     steps,
+    cfg_scale,
     wfc_guidance_start_step,
     wfc_guidance_strength,
     wfc_guidance_final_step,
@@ -128,6 +234,9 @@ def run_demo_img2img(
     show_raw_image
 ):
     global current_tileset, current_mode, current_tilenet, current_pipeline
+
+    if should_log_prompt:
+        time_start = time.time()
 
     # 1. Define pipeline
     if torch.cuda.is_available():
@@ -142,9 +251,10 @@ def run_demo_img2img(
         tilenet = current_tilenet
         pipeline = current_pipeline
     else:
+        vae_path, vae_subfolder = get_vae_path(tileset)
         tilenet = AutoencoderTile.from_pretrained(
-            get_pretrained_path(tileset),
-            subfolder="tile_vae"
+            vae_path,
+            subfolder=vae_subfolder
         ).to(device)
         pipeline = WaveFunctionDiffusionImg2ImgPipeline.from_pretrained(
             get_pretrained_path(tileset),
@@ -152,6 +262,7 @@ def run_demo_img2img(
             wfc_data_path = wfc_data_path
         )
         pipeline.to(device)
+        pipeline.set_precision("half")
 
         current_mode = "img2img"
         current_tileset = tileset
@@ -166,6 +277,8 @@ def run_demo_img2img(
     if brightness != 0:
         img_np = np.array(image, dtype = np.float32)
         img_np += brightness * 127.5
+        img_np = np.minimum(img_np, 255)
+        img_np = np.maximum(img_np, 0)
         img_np = img_np.astype(np.uint8)
         image = Image.fromarray(img_np)
 
@@ -175,6 +288,7 @@ def run_demo_img2img(
         negative_prompt = neg_prompt,
         image = image,
         num_inference_steps = steps,
+        guidance_scale = cfg_scale,
         wfc_guidance_start_step = wfc_guidance_start_step,
         wfc_guidance_strength = wfc_guidance_strength,
         wfc_guidance_final_steps = wfc_guidance_final_step,
@@ -199,6 +313,13 @@ def run_demo_img2img(
         wfc_data_path = wfc_data_path
     )
 
+    if should_log_prompt:
+        print("Generated image and map for prompt [{}] at {} steps in {:.2f} seconds.".format(
+            prompt,
+            steps,
+            time.time() - time_start
+        ))
+
     return image, gen_map
 
 def preinstall():
@@ -210,9 +331,10 @@ def preinstall():
         device = "cpu"
 
     tileset = DEFAULT_TILESET
+    vae_path, vae_subfolder = get_vae_path(tileset)
     tilenet = AutoencoderTile.from_pretrained(
-        get_pretrained_path(tileset),
-        subfolder="tile_vae"
+        vae_path,
+        subfolder=vae_subfolder
     ).to(device)
     wfc_data_path = get_wfc_data_path(tileset)
     pipeline = WaveFunctionDiffusionPipeline.from_pretrained(
@@ -221,6 +343,7 @@ def preinstall():
         wfc_data_path = wfc_data_path
     )
     pipeline.to(device)
+    pipeline.set_precision("half")
 
     current_mode = "txt2img"
     current_tileset = tileset
@@ -228,6 +351,9 @@ def preinstall():
     current_pipeline = pipeline
 
 def start_demo(args):
+    global should_log_prompt
+    if hasattr(args, "log_prompt") and args.log_prompt:
+        should_log_prompt = True
     if args.colab:
         preinstall()
     with gr.Blocks(analytics_enabled=False, title="WaveFunctionDiffusion demo page") as demo:
@@ -237,14 +363,15 @@ def start_demo(args):
             with gr.Row():
                 with gr.Column():
                     prompt = gr.Textbox(label="Prompt", value="Lost Temple")
-                    auto_add_dreambooth = gr.Checkbox(value=True, label="Automatically add the dreambooth prompt ('isometric scspace terrain')")
+                    auto_add_dreambooth = gr.Checkbox(value=True, label="Automatically add the dreambooth prompt (e.g. 'isometric starcraft jungle terrain')")
                     neg_prompt = gr.Textbox(label="Negative Prompt")
-                    tileset = gr.Dropdown(SUPPORTED_TILESETS, value=DEFAULT_TILESET, label="Tileset (currently only platform is trained)")
+                    tileset = gr.Dropdown(SUPPORTED_TILESETS, value=DEFAULT_TILESET, label="Tileset")
                     steps = gr.Slider(minimum=1, maximum=100, step=1, value=50, label="Scheduler steps")
-                    wfc_guidance_start_step = gr.Slider(minimum=0, maximum=50, value=20, step=1, label="WFC guidance starting step")
+                    cfg_scale = gr.Slider(minimum=0, maximum=15, step=0.1, value=3.5, label="CFG Guidance Scale")
+                    wfc_guidance_start_step = gr.Slider(minimum=0, maximum=100, value=30, step=1, label="WFC guidance starting step")
                     wfc_guidance_strength = gr.Slider(minimum=0, maximum=100, value=5, step=0.1, label="WFC guidance strength")
-                    wfc_guidance_final_step = gr.Slider(minimum=0, maximum=100, value=20, step=1, label="WFC guidance final steps")
-                    wfc_guidance_final_strength = gr.Slider(minimum=0, maximum=100, value=10, step=0.1, label="WFC guidance final strength")
+                    wfc_guidance_final_step = gr.Slider(minimum=0, maximum=100, value=10, step=1, label="WFC guidance final steps")
+                    wfc_guidance_final_strength = gr.Slider(minimum=0, maximum=100, value=5, step=0.1, label="WFC guidance final strength")
                     show_raw_image = gr.Checkbox(label="Show raw generated image")
                 with gr.Column():
                     btn = gr.Button("Start Diffusion!")
@@ -256,6 +383,7 @@ def start_demo(args):
                 neg_prompt,
                 tileset,
                 steps,
+                cfg_scale,
                 wfc_guidance_start_step,
                 wfc_guidance_strength,
                 wfc_guidance_final_step,
@@ -269,16 +397,17 @@ def start_demo(args):
             with gr.Row():
                 with gr.Column():
                     i2i_prompt = gr.Textbox(label="Prompt", value="Lost Temple")
-                    i2i_auto_add_dreambooth = gr.Checkbox(value=True, label="Automatically add the dreambooth prompt ('isometric scspace terrain')")
+                    i2i_auto_add_dreambooth = gr.Checkbox(value=True, label="Automatically add the dreambooth prompt (e.g. 'isometric scspace terrain')")
                     i2i_neg_prompt = gr.Textbox(label="Negative Prompt")
                     i2i_image_pil = gr.Image(type="pil", label="Image")
-                    i2i_tileset = gr.Dropdown(SUPPORTED_TILESETS, value=DEFAULT_TILESET, label="Tileset (currently only platform is trained)")
-                    i2i_brightness = gr.Slider(minimum=-1, maximum=1, step=0.01, value=0, label="Brightness fix")
+                    i2i_tileset = gr.Dropdown(SUPPORTED_TILESETS, value=DEFAULT_TILESET, label="Tileset")
+                    i2i_brightness = gr.Slider(minimum=-2, maximum=2, step=0.01, value=0, label="Brightness fix (Turn down if image is too bright)")
                     i2i_steps = gr.Slider(minimum=1, maximum=100, step=1, value=50, label="Scheduler steps")
-                    i2i_wfc_guidance_start_step = gr.Slider(minimum=0, maximum=50, value=30, step=1, label="WFC guidance starting step")
+                    i2i_cfg_scale = gr.Slider(minimum=0, maximum=15, step=0.1, value=6.5, label="CFG Guidance Scale")
+                    i2i_wfc_guidance_start_step = gr.Slider(minimum=0, maximum=100, value=30, step=1, label="WFC guidance starting step")
                     i2i_wfc_guidance_strength = gr.Slider(minimum=0, maximum=100, value=5, step=0.1, label="WFC guidance strength")
-                    i2i_wfc_guidance_final_step = gr.Slider(minimum=0, maximum=100, value=20, step=1, label="WFC guidance final steps")
-                    i2i_wfc_guidance_final_strength = gr.Slider(minimum=0, maximum=100, value=10, step=0.1, label="WFC guidance final strength")
+                    i2i_wfc_guidance_final_step = gr.Slider(minimum=0, maximum=100, value=10, step=1, label="WFC guidance final steps")
+                    i2i_wfc_guidance_final_strength = gr.Slider(minimum=0, maximum=100, value=5, step=0.1, label="WFC guidance final strength")
                     i2i_show_raw_image = gr.Checkbox(label="Show raw generated image")
                 with gr.Column():
                     i2i_btn = gr.Button("Start Diffusion!")
@@ -292,6 +421,7 @@ def start_demo(args):
                 i2i_tileset,
                 i2i_brightness,
                 i2i_steps,
+                i2i_cfg_scale,
                 i2i_wfc_guidance_start_step,
                 i2i_wfc_guidance_strength,
                 i2i_wfc_guidance_final_step,

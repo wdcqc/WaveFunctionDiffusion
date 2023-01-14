@@ -1,4 +1,9 @@
+# -*- coding: utf-8 -*-
+# Copyright @ 2023 wdcqc/aieud project.
+# Open-source under license obtainable in project root (LICENSE.md).
+
 import numpy as np, os, json, struct
+from .tile_data import TILE_DATA_PATH
 
 doodad_start_each_tileset = {
     "badlands" : 1024,
@@ -123,7 +128,7 @@ def save_json(p, n, d):
         json.dump(d, fp)
 
 def work_tileset(tileset,
-                 base_path = "../tile_data/",
+                 base_path = TILE_DATA_PATH,
                  cv5_root = "../sc_files/TileSet",
                  ):
     if not os.path.exists(base_path):
@@ -133,7 +138,7 @@ def work_tileset(tileset,
     print("{} converted to json format, length {}".format(tileset, len(data)))
 
 def additional_info_tileset(tileset,
-                            base_path = "../tile_data/",
+                            base_path = TILE_DATA_PATH,
                             cv5_root = "../sc_files/TileSet",
                             ):
     cv5_data_path = os.path.join(base_path, "{}.json".format(tileset))
@@ -174,7 +179,7 @@ def additional_info_tileset(tileset,
 
     print("additional information added to {}_v2.npz, length {}".format(tileset, len(cv5_data)))
 
-def get_tile_index_mapping(tileset, base_path = "../tile_data/"):
+def get_tile_index_mapping(tileset, base_path = TILE_DATA_PATH):
     cv5_data_path = os.path.join(base_path, "{}.json".format(tileset))
     with open(cv5_data_path, encoding = "utf8") as fp:
         cv5_data = json.load(fp)
@@ -228,7 +233,7 @@ def get_tile_index_mapping(tileset, base_path = "../tile_data/"):
     }
 
 if __name__ == "__main__":
-    base_path = "../tile_data/"
+    base_path = TILE_DATA_PATH
 
     work_tileset("ashworld")
     work_tileset("badlands")

@@ -41,28 +41,38 @@ Sample code:
 # Load pipeline
 from wfd.wf_diffusers import WaveFunctionDiffusionPipeline
 from wfd.wf_diffusers import AutoencoderTile
+from wfd.scmap import get_tile_data, get_tileset_keyword
 
-wfc_data_path = "tile_data/wfc/platform_32x32.npz"
+# Tilesets: ashworld, badlands, desert, ice, jungle, platform, twilight, install
+tileset = "ice"
+
+# The data files are located in wfd/scmap/tile_data/wfc
+wfc_data_path = get_tile_data("wfc/{}_64x64.npz".format(tileset))
 
 # Use CUDA (otherwise it will take 15 minutes)
 device = "cuda"
 
 tilenet = AutoencoderTile.from_pretrained(
-    "wdcqc/starcraft-platform-terrain-32x32",
-    subfolder="tile_vae"
+    "wdcqc/starcraft-terrain-64x64",
+    subfolder="tile_vae_{}".format(tileset)
 ).to(device)
 pipeline = WaveFunctionDiffusionPipeline.from_pretrained(
-    "wdcqc/starcraft-platform-terrain-32x32",
+    "wdcqc/starcraft-terrain-64x64",
     tile_vae = tilenet,
     wfc_data_path = wfc_data_path
 )
 pipeline.to(device)
 
+# Double speed (only works for CUDA)
+pipeline.set_precision("half")
+
 # Generate pipeline output
-# need to include the dreambooth keyword "isometric scspace terrain"
+# need to include the dreambooth keywords "isometric starcraft {tileset_keyword} terrain"
+tileset_keyword = get_tileset_keyword(tileset)
 pipeline_output = pipeline(
-    "isometric scspace terrain, corgi",
+    "lost temple, isometric starcraft {} terrain".format(tileset_keyword),
     num_inference_steps = 50,
+    guidance_scale = 3.5,
     wfc_guidance_start_step = 20,
     wfc_guidance_strength = 5,
     wfc_guidance_final_steps = 20,
@@ -87,7 +97,7 @@ import random, time
 
 tiles_to_scx(
     tile_result,
-    "outputs/generated_{}_{:04d}.scx".format(time.strftime("%Y%m%d_%H%M%S"), random.randint(0, 1e4)),
+    "outputs/{}_{}_{:04d}.scx".format(tileset, time.strftime("%Y%m%d_%H%M%S"), random.randint(0, 1e4)),
     wfc_data_path = wfc_data_path
 )
 ```
@@ -128,15 +138,17 @@ __Q: Why take argmax of the generated wave, instead of using it as a prior distr
 
 A: Because it doesn't work. It frequently generates impossible wave states, making WFC unsolvable (ㅠㅠㅠ)
 
+__Q: Why choose Starcraft as the target, comparing to other tile-based games?__
+
+A: It's only because I'm more familiar with starcraft. I believe it would also be interesting for like RPG Maker and Super Mario Maker, but I would have no idea where to get the _dataset_.
+
 __Q: How is this algorithm related to quantum physics?__
 
 A: It's not. I named it wave function diffusion because Wave Function Collapse did it in the first place lmao
 
 __Q: You seriously wasted over three weeks of time to create a terrain generator for a dead game???__
 
-A: Technically, it can be used to generate tile maps for other games as well, should anyone train it on other datasets. However, deep down in the heart I know no one will do it anyways, so this is just my learning process of the diffusion algorithm.
-
-In programming the best way to learn is to build something yourself, so it's not a waste of time. Plus, it's all blizz's fault anyways.
+A: Well it's all blizz's fault for trashing their games
 
 __Q: This will replace game level designing jobs and make everyone jobless!!!!🤬🤬🤬__
 

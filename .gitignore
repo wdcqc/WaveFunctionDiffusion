@@ -12,6 +12,7 @@ sc_data/
 
 # Huggingface
 spaces/
+runwayml/
 
 # Weights
 weights/

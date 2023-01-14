@@ -6,6 +6,7 @@ import os
 import warnings
 from pathlib import Path
 from typing import Optional
+import json
 
 import torch
 import torch.nn.functional as F
@@ -60,7 +61,6 @@ def parse_args(input_args=None):
         "--pretrained_model_name_or_path",
         type=str,
         default=None,
-        required=True,
         help="Path to pretrained model or model identifier from huggingface.co/models.",
     )
     parser.add_argument(
@@ -80,7 +80,6 @@ def parse_args(input_args=None):
         "--instance_data_dir",
         type=str,
         default=None,
-        required=True,
         help="A folder containing the training data of instance images.",
     )
     parser.add_argument(
@@ -94,7 +93,6 @@ def parse_args(input_args=None):
         "--instance_prompt",
         type=str,
         default=None,
-        required=True,
         help="The prompt with identifier specifying the instance",
     )
     parser.add_argument(
@@ -115,9 +113,23 @@ def parse_args(input_args=None):
         action="store_true",
         help="Append map name to instance prompt.",
     )
-    parser.add_argument("--brightness_fix", type=float, default=0.100, help="Brightness fix")
+    parser.add_argument("--brightness_fix", type=str, default="0.100", help="Brightness fix")
     parser.add_argument("--map_size_x", type=int, default=32, help="Horizontal size of map sliced from training maps")
     parser.add_argument("--map_size_y", type=int, default=32, help="Vertical size of map sliced from training maps")
+    parser.add_argument("--tileset_mix", type=str, default=None, help="Mix several tilesets for training. JSON format list.")
+    parser.add_argument("--tileset_keywords", type=str, default=None, help="Tileset keywords. Replaces <tileset> in instance prompt when using tileset mix. JSON format list.")
+    parser.add_argument("--min_map_variations", type=int, default=1, help="Ignore maps with less than N possible crops to avoid overfitting on certain maps.")
+    parser.add_argument("--dataset_cache_dir", type=str, default=None, help="Directory to cache the datasets.")
+    parser.add_argument(
+        "--config",
+        type=str,
+        default=None,
+        help=(
+            "Almost all problems in a python script can be solved by adding more command line arguments, including the problem "
+            "of too many command line arguments. This is the ultimate solution to overbloated command line arguments: "
+            "Loads all command line arguments from a JSON config file."
+        ),
+    )
     parser.add_argument("--prior_loss_weight", type=float, default=1.0, help="The weight of prior preservation loss.")
     parser.add_argument(
         "--num_class_images",
@@ -131,7 +143,7 @@ def parse_args(input_args=None):
     parser.add_argument(
         "--output_dir",
         type=str,
-        default="text-inversion-model",
+        default="dreambooth-model",
         help="The output directory where the model predictions and checkpoints will be written.",
     )
     parser.add_argument("--seed", type=int, default=None, help="A seed for reproducible training.")
@@ -265,6 +277,17 @@ def parse_args(input_args=None):
     else:
         args = parser.parse_args()
 
+    if args.config is not None:
+        with open(args.config, encoding = "utf-8") as config_fp:
+            config_args = json.load(config_fp)
+
+        for key in config_args:
+            setattr(args, key, config_args[key])
+
+    # remake the argparse assertion
+    if (args.pretrained_model_name_or_path is None or args.instance_data_dir is None or args.instance_prompt is None):
+        raise ValueError("error: the following arguments are required: --pretrained_model_name_or_path, --instance_data_dir, --instance_prompt")
+
     env_local_rank = int(os.environ.get("LOCAL_RANK", -1))
     if env_local_rank != -1 and env_local_rank != args.local_rank:
         args.local_rank = env_local_rank
@@ -338,7 +361,7 @@ def main(args):
     accelerator = Accelerator(
         gradient_accumulation_steps=args.gradient_accumulation_steps,
         mixed_precision=args.mixed_precision,
-        log_with="tensorboard",
+        # log_with="tensorboard",
         logging_dir=logging_dir,
     )
 
@@ -494,18 +517,37 @@ def main(args):
 
     noise_scheduler = DDPMScheduler.from_pretrained(args.pretrained_model_name_or_path, subfolder="scheduler")
 
-    train_dataset = SCInputMapsDreamBoothDataset(
-        instance_data_root=args.instance_data_dir,
-        instance_prompt=args.instance_prompt,
-        class_data_root=args.class_data_dir if args.with_prior_preservation else None,
-        class_prompt=args.class_prompt,
-        tokenizer=tokenizer,
-        size=args.resolution,
-        map_size=(args.map_size_x, args.map_size_y),
-        center_crop=args.center_crop,
-        append_map_name=args.append_map_name,
-        brightness_fix=args.brightness_fix,
-    )
+    if args.tileset_mix is not None:
+        train_dataset = SCInputMapsDreamBoothDataset(
+            instance_data_root=args.instance_data_dir,
+            instance_prompt=args.instance_prompt,
+            class_data_root=args.class_data_dir if args.with_prior_preservation else None,
+            class_prompt=args.class_prompt,
+            tokenizer=tokenizer,
+            size=args.resolution,
+            map_size=(args.map_size_x, args.map_size_y),
+            center_crop=args.center_crop,
+            append_map_name=args.append_map_name,
+            brightness_fix=json.loads(args.brightness_fix),
+            tileset_mix=json.loads(args.tileset_mix),
+            tileset_keywords=json.loads(args.tileset_mix) if args.tileset_keywords is None else json.loads(args.tileset_keywords),
+            min_map_variations=args.min_map_variations,
+            dataset_cache_dir=args.dataset_cache_dir
+        )
+    else:
+        train_dataset = SCInputMapsDreamBoothDataset(
+            instance_data_root=args.instance_data_dir,
+            instance_prompt=args.instance_prompt,
+            class_data_root=args.class_data_dir if args.with_prior_preservation else None,
+            class_prompt=args.class_prompt,
+            tokenizer=tokenizer,
+            size=args.resolution,
+            map_size=(args.map_size_x, args.map_size_y),
+            center_crop=args.center_crop,
+            append_map_name=args.append_map_name,
+            brightness_fix=float(args.brightness_fix),
+            dataset_cache_dir=args.dataset_cache_dir
+        )
 
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset,

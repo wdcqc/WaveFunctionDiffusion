@@ -4,6 +4,7 @@
 
 import os, numpy as np, struct
 from ..mpqapi import get_chk_from_mpq, pack_to_mpq
+from .default import DEFAULT_CHK_PATH
 
 def get_map_data(map_path):
     if map_path.endswith(".chk"):
@@ -59,7 +60,7 @@ def get_tile_data(data):
     
     return tileset, dim, np.array(section_data).reshape((dim[1], dim[0]))
 
-def get_default_output_map_data(map_file = "default/base.chk"):
+def get_default_output_map_data(map_file = DEFAULT_CHK_PATH):
     return get_map_data(map_file)
 
 def replace_tile_data(data, new_tileset, new_dim, new_mtxm):
@@ -115,7 +116,7 @@ def replace_tile_data(data, new_tileset, new_dim, new_mtxm):
     
     return new_dim, data
 
-def tiles_to_scx(tile_results, file_out_name, tileset = None, tile_consts = None, wfc_data_path = None, base_map_file = "default/base.chk"):
+def tiles_to_scx(tile_results, file_out_name, tileset = None, tile_consts = None, wfc_data_path = None, base_map_file = DEFAULT_CHK_PATH):
     if not isinstance(tile_results, np.ndarray):
         tile_results = np.array(tile_results, dtype = int)
     size = (tile_results.shape[1], tile_results.shape[0])
