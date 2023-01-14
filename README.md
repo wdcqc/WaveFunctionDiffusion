@@ -6,9 +6,11 @@ It uses a dreamboothed Stable Diffusion model trained with images of tile maps, 
 
 A WFC Guidance is also added to the sampling process, which pushes the generated tile map closer to the WFC transition rules. For more information about how guidance works, check out this tutorial: [Fine-Tuning, Guidance and Conditioning](https://github.com/huggingface/diffusion-models-class/tree/main/unit2)
 
-The model is trained with 265 melee maps on the Space Platform tileset, which are mostly downloaded from Battle.net, bounding.net (scmscx.com) and broodwarmaps.net.
+The model is trained with melee maps on all tilesets, which are downloaded from Battle.net, bounding.net (scmscx.com) and broodwarmaps.net.
 
-Huggingface: https://huggingface.co/wdcqc/starcraft-platform-terrain-32x32
+Huggingface Model: https://huggingface.co/wdcqc/starcraft-terrain-64x64
+
+Huggingface Spaces: https://huggingface.co/spaces/wdcqc/wfd
 
 ### Run with Colab
 
@@ -132,7 +134,7 @@ Note that I added custom options like `--append_map_name`, `--brightness_fix` to
 
 __Q: Is it necessary to train the entire VAE? Looks like the encoder can totally be skipped, only the decoding step is necessary.__
 
-A: It's not. In hindsight, training only the decoder should be sufficient. But I already trained the encoder anyways so why not lol.
+A: It's not. The encoder is only slightly trained to guide the decoder, currently (for 64x64 models) only the decoder is fully trained.
 
 __Q: Why take argmax of the generated wave, instead of using it as a prior distribution for WFC? It should make the result more accurate.__
 
@@ -148,7 +150,7 @@ A: It's not. I named it wave function diffusion because Wave Function Collapse d
 
 __Q: You seriously wasted over three weeks of time to create a terrain generator for a dead game???__
 
-A: Well it's all blizz's fault for trashing their games
+A: Well it's all blizz's fault for trashing their games, otherwise this could have been a great project
 
 __Q: This will replace game level designing jobs and make everyone jobless!!!!🤬🤬🤬__
 

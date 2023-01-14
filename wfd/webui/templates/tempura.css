@@ -29,7 +29,7 @@
 
 /* TOKENS */
 
-.gradio-container .progress-bar {{
+.gradio-container .progress-bar, .gradio-container .eta-bar {{
     background-color: {accentColor};
 }}
 
