@@ -11,12 +11,11 @@ from ..wf_diffusers import WaveFunctionDiffusionImg2ImgPipeline
 
 from ..scmap import tiles_to_scx, demo_map_image, get_tile_data
 from .doki import theme, theme_settings
-import random, time
+import random, time, json
 
 from PIL import Image
 import numpy as np
 import os
-import time
 
 DEFAULT_TILESET = "jungle"
 SUPPORTED_TILESETS = ["ashworld", "badlands", "desert", "ice", "jungle", "platform", "twilight", "installation", "platform_32x32"]
