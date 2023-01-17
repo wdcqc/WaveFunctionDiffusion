@@ -21,7 +21,7 @@ Huggingface Spaces: https://huggingface.co/spaces/wdcqc/wfd
 1. Install Python 3.9 (3.8 or 3.10 should also work)
 1. Install CUDA and PyTorch
 2. Install requirements with `pip install -r requirements.txt`
-3. (Optional) Install xformers (this is pretty complicated but it increases diffusion efficiency)
+3. (Optional) Install [xformers](https://github.com/facebookresearch/xformers) (this is pretty complicated but it increases diffusion efficiency)
 
 ### Local demo
 
