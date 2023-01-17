@@ -136,6 +136,8 @@ def run_demo(
     wfc_guidance_strength,
     wfc_guidance_final_step,
     wfc_guidance_final_strength,
+    map_width,
+    map_height,
     show_raw_image
 ):
     global current_tileset, current_mode, current_tilenet, current_pipeline
@@ -178,9 +180,16 @@ def run_demo(
     if auto_add_dreambooth:
         prompt = prompt + get_dreambooth_prompt(tileset)
 
+    if map_width * map_height > 64 * 64:
+        pipeline.enable_attention_slicing()
+    else:
+        pipeline.disable_attention_slicing()
+
     # 2. Pipe
     pipeline_output = pipeline(
         prompt,
+        width = 8 * map_width,
+        height = 8 * map_height,
         negative_prompt = neg_prompt,
         num_inference_steps = steps,
         guidance_scale = cfg_scale,
@@ -230,6 +239,8 @@ def run_demo_img2img(
     wfc_guidance_strength,
     wfc_guidance_final_step,
     wfc_guidance_final_strength,
+    map_width,
+    map_height,
     show_raw_image
 ):
     global current_tileset, current_mode, current_tilenet, current_pipeline
@@ -271,7 +282,7 @@ def run_demo_img2img(
     if auto_add_dreambooth:
         prompt = get_dreambooth_prompt(tileset) + prompt
 
-    image = image_pil.resize((512, 512))
+    image = image_pil.resize((8 * map_width, 8 * map_height))
 
     if brightness != 0:
         img_np = np.array(image, dtype = np.float32)
@@ -280,6 +291,11 @@ def run_demo_img2img(
         img_np = np.maximum(img_np, 0)
         img_np = img_np.astype(np.uint8)
         image = Image.fromarray(img_np)
+
+    if map_width * map_height > 64 * 64:
+        pipeline.enable_attention_slicing()
+    else:
+        pipeline.disable_attention_slicing()
 
     # 2. Pipe
     pipeline_output = pipeline(
@@ -353,6 +369,13 @@ def start_demo(args):
     global should_log_prompt
     if hasattr(args, "log_prompt") and args.log_prompt:
         should_log_prompt = True
+
+    # Max map size should be set to a value that avoids CUDA Out of Memory error
+    if hasattr(args, "max_size") and args.max_size is not None:
+        max_map_size = args.max_size
+    else:
+        max_map_size = 256
+
     if args.colab:
         preinstall()
     with gr.Blocks(analytics_enabled=False, title="WaveFunctionDiffusion demo page") as demo:
@@ -371,6 +394,8 @@ def start_demo(args):
                     wfc_guidance_strength = gr.Slider(minimum=0, maximum=100, value=5, step=0.1, label="WFC guidance strength")
                     wfc_guidance_final_step = gr.Slider(minimum=0, maximum=100, value=10, step=1, label="WFC guidance final steps")
                     wfc_guidance_final_strength = gr.Slider(minimum=0, maximum=100, value=5, step=0.1, label="WFC guidance final strength")
+                    map_width = gr.Slider(minimum=32, maximum=max_map_size, step=32, value=64, label="Width")
+                    map_height = gr.Slider(minimum=32, maximum=max_map_size, step=32, value=64, label="Height")
                     show_raw_image = gr.Checkbox(label="Show raw generated image")
                 with gr.Column():
                     btn = gr.Button("Start Diffusion!")
@@ -387,6 +412,8 @@ def start_demo(args):
                 wfc_guidance_strength,
                 wfc_guidance_final_step,
                 wfc_guidance_final_strength,
+                map_width,
+                map_height,
                 show_raw_image
             ], outputs=[
                 output_image,
@@ -407,6 +434,8 @@ def start_demo(args):
                     i2i_wfc_guidance_strength = gr.Slider(minimum=0, maximum=100, value=5, step=0.1, label="WFC guidance strength")
                     i2i_wfc_guidance_final_step = gr.Slider(minimum=0, maximum=100, value=10, step=1, label="WFC guidance final steps")
                     i2i_wfc_guidance_final_strength = gr.Slider(minimum=0, maximum=100, value=5, step=0.1, label="WFC guidance final strength")
+                    i2i_map_width = gr.Slider(minimum=32, maximum=max_map_size, step=32, value=64, label="Width")
+                    i2i_map_height = gr.Slider(minimum=32, maximum=max_map_size, step=32, value=64, label="Height")
                     i2i_show_raw_image = gr.Checkbox(label="Show raw generated image")
                 with gr.Column():
                     i2i_btn = gr.Button("Start Diffusion!")
@@ -425,6 +454,8 @@ def start_demo(args):
                 i2i_wfc_guidance_strength,
                 i2i_wfc_guidance_final_step,
                 i2i_wfc_guidance_final_strength,
+                i2i_map_width,
+                i2i_map_height,
                 i2i_show_raw_image
             ], outputs=[
                 i2i_output_image,

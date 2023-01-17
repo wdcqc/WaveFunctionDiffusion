@@ -19,6 +19,7 @@ def train_loop(net,
                loss_weights = None,
                recon_temperature = 0.01,
                max_nudge = 5,
+               nudge_brightness = None,
                nudge_loss_type = "ce",
                grad_accum = 1,
                log_interval = 100,
@@ -60,6 +61,8 @@ def train_loop(net,
             The temperature value of reconstruction loss. Not fully understood (by me).
         max_nudge (`int`, *optional*, defaults to 5):
             The max amount to nudge the tile image for nudge_loss. Should be 5 for 32x32 and 3 for 64x64.
+        nudge_brightness (`List[float]`, *optional*):
+            Range to change the brightness for nudge_loss augmentation, as a tuple of (min, max) (ranging from -1 to 1)
         nudge_loss_type (`"ce"` or `"recon"`, *optional*, defaults to `"ce"`):
             The type of loss used for nudge_loss.
         grad_accum (`int`, *optional*, defaults to 1):
@@ -146,6 +149,11 @@ def train_loop(net,
             
             if loss_weights["nudge"] != 0:
                 images = offset_tensor(images, max_nudge)
+                if nudge_brightness is not None:
+                    brightness_min, brightness_max = nudge_brightness
+                    brightness_delta = torch.rand(1, device=device) * (brightness_max - brightness_min) + brightness_min
+                    images += brightness_delta
+
                 with torch.no_grad():
                     img_encode_result = vae.encode(images)
                     img_latents = img_encode_result.latent_dist.sample()

@@ -132,6 +132,16 @@ Note that I added custom options like `--append_map_name`, `--brightness_fix` to
 
 ### Never-Asked Questions
 
+__Q: How do I generate maps larger than 64x64?__
+
+A: Pass in parameters `width` and `height` to the `pipeline` function call.
+
+The numbers should be 8 times the map size, e.g. `width=512, height=512` gives a 64x64 map, and `width=768, height=768` gives 96x96.
+
+If CUDA runs out of memory, install [xformers](https://github.com/facebookresearch/xformers) and add `pipeline.enable_attention_slicing()` before calling the pipeline.
+
+`pipeline.enable_vae_slicing()` and `pipeline.enable_sequential_cpu_offload()` may help as well for reducing memory cost.
+
 __Q: Is it necessary to train the entire VAE? Looks like the encoder can totally be skipped, only the decoding step is necessary.__
 
 A: It's not. The encoder is only slightly trained to guide the decoder, currently (for 64x64 models) only the decoder is fully trained.
@@ -142,7 +152,7 @@ A: Because it doesn't work. It frequently generates impossible wave states, maki
 
 __Q: Why choose Starcraft as the target, comparing to other tile-based games?__
 
-A: It's only because I'm more familiar with starcraft. I believe it would also be interesting for like RPG Maker and Super Mario Maker, but I would have no idea where to get the _dataset_.
+A: It's only because I'm more familiar with starcraft. It would also be interesting for like RPG Maker and Super Mario Maker, but I would have no idea where to get the _dataset_.
 
 __Q: How is this algorithm related to quantum physics?__
 
