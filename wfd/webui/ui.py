@@ -423,7 +423,7 @@ def start_demo(args):
             with gr.Row():
                 with gr.Column():
                     i2i_prompt = gr.Textbox(label="Prompt", value="Lost Temple")
-                    i2i_auto_add_dreambooth = gr.Checkbox(value=True, label="Automatically add the dreambooth prompt (e.g. 'isometric scspace terrain')")
+                    i2i_auto_add_dreambooth = gr.Checkbox(value=True, label="Automatically add the dreambooth prompt (e.g. 'isometric starcraft jungle terrain')")
                     i2i_neg_prompt = gr.Textbox(label="Negative Prompt")
                     i2i_image_pil = gr.Image(type="pil", label="Image")
                     i2i_tileset = gr.Dropdown(SUPPORTED_TILESETS, value=DEFAULT_TILESET, label="Tileset")
