@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='wfd',
-    version='0.5.0',    
+    version='0.6.0',    
     description='Wave Function Diffusion',
     url='https://github.com/wdcqc/WaveFunctionDiffusion',
     author='wdcqc',
