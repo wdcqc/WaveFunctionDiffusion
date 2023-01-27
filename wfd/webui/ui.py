@@ -257,6 +257,7 @@ def run_demo_img2img(
     neg_prompt,
     image_pil,
     tileset,
+    strength,
     brightness,
     steps,
     cfg_scale,
@@ -328,6 +329,7 @@ def run_demo_img2img(
         prompt,
         negative_prompt = neg_prompt,
         image = image,
+        strength = strength,
         num_inference_steps = steps,
         guidance_scale = cfg_scale,
         wfc_guidance_start_step = wfc_guidance_start_step,
@@ -459,6 +461,7 @@ def start_demo(args):
                     i2i_neg_prompt = gr.Textbox(label="Negative Prompt")
                     i2i_image_pil = gr.Image(type="pil", label="Image")
                     i2i_tileset = gr.Dropdown(SUPPORTED_TILESETS, value=DEFAULT_TILESET, label="Tileset")
+                    i2i_strength = gr.Slider(minimum=0, maximum=1, step=0.001, value=0.8, label="Diffusion strength")
                     i2i_brightness = gr.Slider(minimum=-2, maximum=2, step=0.01, value=0, label="Brightness fix (Turn down if image is too bright)")
                     i2i_steps = gr.Slider(minimum=1, maximum=100, step=1, value=50, label="Scheduler steps")
                     i2i_cfg_scale = gr.Slider(minimum=0, maximum=15, step=0.1, value=6.5, label="CFG Guidance Scale")
@@ -481,6 +484,7 @@ def start_demo(args):
                 i2i_neg_prompt,
                 i2i_image_pil,
                 i2i_tileset,
+                i2i_strength,
                 i2i_brightness,
                 i2i_steps,
                 i2i_cfg_scale,
