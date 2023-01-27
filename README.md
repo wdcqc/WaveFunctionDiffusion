@@ -43,13 +43,13 @@ Sample code:
 # Load pipeline
 from wfd.wf_diffusers import WaveFunctionDiffusionPipeline
 from wfd.wf_diffusers import AutoencoderTile
-from wfd.scmap import get_tile_data, get_tileset_keyword
+from wfd.scmap import find_tile_data, get_tileset_keyword
 
 # Tilesets: ashworld, badlands, desert, ice, jungle, platform, twilight, install
 tileset = "ice"
 
 # The data files are located in wfd/scmap/tile_data/wfc
-wfc_data_path = get_tile_data("wfc/{}_64x64.npz".format(tileset))
+wfc_data_path = find_tile_data("wfc/{}_64x64.npz".format(tileset))
 
 # Use CUDA (otherwise it will take 15 minutes)
 device = "cuda"

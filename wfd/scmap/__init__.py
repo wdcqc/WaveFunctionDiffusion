@@ -8,7 +8,9 @@ from .data_processing import (
     get_connections_and_freqs,
     process_input_maps,
     get_subtile_probs,
-    randomize_subtiles
+    randomize_subtiles,
+    add_symmetry,
+    tiles_to_scx
 )
 
 from .map_display import (
@@ -24,13 +26,12 @@ from .map_data import (
     tileset_to_era,
     get_tile_data,
     get_default_output_map_data,
-    replace_tile_data,
-    tiles_to_scx
+    replace_tile_data
 )
 
 from .tile_data import (
     TILE_DATA_PATH,
-    get_tile_data,
+    find_tile_data,
     get_tileset_keyword
 )
 

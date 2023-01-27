@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='wfd',
-    version='0.4.0',    
+    version='0.5.0',    
     description='Wave Function Diffusion',
     url='https://github.com/wdcqc/WaveFunctionDiffusion',
     author='wdcqc',
@@ -16,6 +16,7 @@ setup(
         'webui/templates/*.css',
         'scmap/tile_data/*',
         'scmap/tile_data/wfc/*',
+        'scmap/tile_data/symmetry/*',
         'scmap/default/*',
     ]},
     include_package_data=True,

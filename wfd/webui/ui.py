@@ -9,7 +9,7 @@ from ..wf_diffusers import AutoencoderTile
 from ..wf_diffusers import WaveFunctionDiffusionPipeline
 from ..wf_diffusers import WaveFunctionDiffusionImg2ImgPipeline
 
-from ..scmap import tiles_to_scx, demo_map_image, get_tile_data
+from ..scmap import tiles_to_scx, demo_map_image, find_tile_data, add_symmetry
 from .doki import theme, theme_settings
 import random, time, json
 
@@ -85,23 +85,44 @@ def get_vae_path(tileset):
 
 def get_wfc_data_path(tileset):
     if tileset == "platform_32x32":
-        return get_tile_data("wfc/platform_32x32.npz")
+        return find_tile_data("wfc/platform_32x32.npz")
     elif tileset == "ashworld":
-        return get_tile_data("wfc/ashworld_64x64.npz")
+        return find_tile_data("wfc/ashworld_64x64.npz")
     elif tileset == "badlands":
-        return get_tile_data("wfc/badlands_64x64.npz")
+        return find_tile_data("wfc/badlands_64x64.npz")
     elif tileset == "desert":
-        return get_tile_data("wfc/desert_64x64.npz")
+        return find_tile_data("wfc/desert_64x64.npz")
     elif tileset == "ice":
-        return get_tile_data("wfc/ice_64x64.npz")
+        return find_tile_data("wfc/ice_64x64.npz")
     elif tileset == "jungle":
-        return get_tile_data("wfc/jungle_64x64.npz")
+        return find_tile_data("wfc/jungle_64x64.npz")
     elif tileset == "platform":
-        return get_tile_data("wfc/platform_64x64.npz")
+        return find_tile_data("wfc/platform_64x64.npz")
     elif tileset == "twilight":
-        return get_tile_data("wfc/twilight_64x64.npz")
+        return find_tile_data("wfc/twilight_64x64.npz")
     elif tileset == "installation":
-        return get_tile_data("wfc/install_64x64.npz")
+        return find_tile_data("wfc/install_64x64.npz")
+    raise NotImplementedError
+
+def get_symmetry_path(tileset):
+    if tileset == "platform_32x32":
+        return find_tile_data("symmetry/platform.npz")
+    elif tileset == "ashworld":
+        return find_tile_data("symmetry/ashworld.npz")
+    elif tileset == "badlands":
+        return find_tile_data("symmetry/badlands.npz")
+    elif tileset == "desert":
+        return find_tile_data("symmetry/desert.npz")
+    elif tileset == "ice":
+        return find_tile_data("symmetry/ice.npz")
+    elif tileset == "jungle":
+        return find_tile_data("symmetry/jungle.npz")
+    elif tileset == "platform":
+        return find_tile_data("symmetry/platform.npz")
+    elif tileset == "twilight":
+        return find_tile_data("symmetry/twilight.npz")
+    elif tileset == "installation":
+        return find_tile_data("symmetry/install.npz")
     raise NotImplementedError
 
 def get_dreambooth_prompt(tileset):
@@ -138,6 +159,7 @@ def run_demo(
     wfc_guidance_final_strength,
     map_width,
     map_height,
+    symmetry,
     show_raw_image
 ):
     global current_tileset, current_mode, current_tilenet, current_pipeline
@@ -205,6 +227,9 @@ def run_demo(
     wave = pipeline_output.waves[0]
     tile_result = wave.argmax(axis=2)
 
+    if symmetry:
+        tile_result = add_symmetry(tile_result, symmetry_path = get_symmetry_path(tileset))
+
     # 4. Get map image
     if not show_raw_image:
         image = demo_map_image(tile_result, wfc_data_path = wfc_data_path)
@@ -241,6 +266,7 @@ def run_demo_img2img(
     wfc_guidance_final_strength,
     map_width,
     map_height,
+    symmetry,
     show_raw_image
 ):
     global current_tileset, current_mode, current_tilenet, current_pipeline
@@ -315,6 +341,9 @@ def run_demo_img2img(
         image = pipeline_output.images[0]
     wave = pipeline_output.waves[0]
     tile_result = wave.argmax(axis=2)
+
+    if symmetry:
+        tile_result = add_symmetry(tile_result, symmetry_path = get_symmetry_path(tileset))
 
     # 4. Get map image
     if not show_raw_image:
@@ -396,7 +425,9 @@ def start_demo(args):
                     wfc_guidance_final_strength = gr.Slider(minimum=0, maximum=100, value=5, step=0.1, label="WFC guidance final strength")
                     map_width = gr.Slider(minimum=32, maximum=max_map_size, step=32, value=64, label="Width")
                     map_height = gr.Slider(minimum=32, maximum=max_map_size, step=32, value=64, label="Height")
-                    show_raw_image = gr.Checkbox(label="Show raw generated image")
+                    with gr.Row():
+                        symmetry = gr.Checkbox(label="Mirror X")
+                        show_raw_image = gr.Checkbox(label="Show raw generated image")
                 with gr.Column():
                     btn = gr.Button("Start Diffusion!")
                     output_image = gr.Image(label="Output Image")
@@ -414,6 +445,7 @@ def start_demo(args):
                 wfc_guidance_final_strength,
                 map_width,
                 map_height,
+                symmetry,
                 show_raw_image
             ], outputs=[
                 output_image,
@@ -436,7 +468,9 @@ def start_demo(args):
                     i2i_wfc_guidance_final_strength = gr.Slider(minimum=0, maximum=100, value=5, step=0.1, label="WFC guidance final strength")
                     i2i_map_width = gr.Slider(minimum=32, maximum=max_map_size, step=32, value=64, label="Width")
                     i2i_map_height = gr.Slider(minimum=32, maximum=max_map_size, step=32, value=64, label="Height")
-                    i2i_show_raw_image = gr.Checkbox(label="Show raw generated image")
+                    with gr.Row():
+                        i2i_symmetry = gr.Checkbox(label="Mirror X")
+                        i2i_show_raw_image = gr.Checkbox(label="Show raw generated image")
                 with gr.Column():
                     i2i_btn = gr.Button("Start Diffusion!")
                     i2i_output_image = gr.Image(label="Output Image")
@@ -456,6 +490,7 @@ def start_demo(args):
                 i2i_wfc_guidance_final_strength,
                 i2i_map_width,
                 i2i_map_height,
+                i2i_symmetry,
                 i2i_show_raw_image
             ], outputs=[
                 i2i_output_image,

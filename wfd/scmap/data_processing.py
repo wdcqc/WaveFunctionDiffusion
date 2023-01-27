@@ -3,9 +3,10 @@
 # Open-source under license obtainable in project root (LICENSE.md).
 
 import numpy as np, json, struct, os
-from .map_data import get_map_data, get_tile_data, replace_tile_data, get_default_output_map_data
+from .map_data import get_map_data, get_tile_data, replace_tile_data, get_default_output_map_data, pack_to_mpq
 from tqdm.auto import tqdm
 from .tile_data import TILE_DATA_PATH
+from .default import DEFAULT_CHK_PATH
 
 CV5_PATHF = os.path.join(TILE_DATA_PATH, "{}_v2.npz")
 MAPPING_PATHF = os.path.join(TILE_DATA_PATH, "{}_mapping.npz")
@@ -186,3 +187,57 @@ def randomize_subtiles(tile_results, tileset, cv5_data = None, rare_prob = 0.125
     
     assert (subtile_map >= 0).all()
     tile_results += subtile_map
+
+def add_symmetry(tile_result, symmetry_path):
+    symm_data = np.load(symmetry_path)
+    symm_mapping = symm_data["mapping"]
+    tile_reversed = symm_mapping[tile_result[:, ::-1]]
+
+    return np.concatenate([tile_result, tile_reversed], axis=1)
+
+def tiles_to_scx(tile_results, file_out_name, tileset = None, tile_consts = None, wfc_data_path = None, base_map_file = DEFAULT_CHK_PATH, random_subtiles = True, rare_subtiles = 0.05):
+    if not isinstance(tile_results, np.ndarray):
+        tile_results = np.array(tile_results, dtype = int)
+    size = (tile_results.shape[1], tile_results.shape[0])
+
+    if wfc_data_path is not None:
+        if tile_consts is not None:
+            raise ValueError("please only specify tile_consts or wfc_data_path")
+        tile_consts = np.load(wfc_data_path)
+
+    if tile_consts is not None:
+        if tile_consts["shrink_range"]:
+            tile_results = tile_consts["shrink_to_gen"][tile_results]
+        tile_results = tile_consts["gen_to_sc"][tile_results]
+        tileset = tile_consts["tileset"].tolist()
+    elif tileset is None:
+        raise ValueError("please specify tileset, tile_consts or wfc_data_path")
+
+    if random_subtiles:
+        randomize_subtiles(tile_results, tileset, rare_prob = rare_subtiles)
+
+    # prevent it from crashing starcraft
+    allowed_sizes = [64, 96, 128, 192, 256]
+    if size[0] not in allowed_sizes and size[0] <= 256:
+        new_size0 = allowed_sizes[np.searchsorted(allowed_sizes, size[0])]
+        tile_results_new = np.ones((size[1], new_size0), dtype=int)
+        tile_results_new[:, :size[0]] = tile_results
+        tile_results = tile_results_new
+        size = (new_size0, size[1])
+    
+    new_map_data = get_default_output_map_data(base_map_file)
+    chk_mtxm_data = tile_results.flatten().tolist()
+    _, output_data = replace_tile_data(new_map_data, tileset, size, chk_mtxm_data)
+
+    # output to map file
+    try:
+        os.makedirs(os.path.dirname(file_out_name))
+    except:
+        pass
+
+    if file_out_name.endswith(".chk"):
+        with open(file_out_name, "wb") as fp:
+            fp.write(output_data)
+        return True
+    else:
+        return pack_to_mpq(output_data, file_out_name)
